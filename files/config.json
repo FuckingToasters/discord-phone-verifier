@@ -1,0 +1,11 @@
+{
+  "Captcha Stuff": {
+    "Captcha Service": "capmonster",
+    "Captcha Service ApiKey": ""
+  },
+
+  "Phone Stuff": {
+    "Phone Service ApiKey": "",
+    "Phone Country ID": "7"
+  }
+}
