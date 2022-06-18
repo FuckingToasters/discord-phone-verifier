@@ -26,10 +26,13 @@ def verify(proxy_type, tzid=None, number=None):
         else: proxy_auth = {"all://": None}
 
     with open("files/tokens.txt", "r+") as token_file:
-        try: line = random.choice(token_file.readlines()).split(":")
-        except IndexError: pystyle.Write.Print("\t[*] Tokens inside tokens.txt are not formatted correctly (token:password)!\n", pystyle.Colors.yellow, interval=0), sys.exit(1)
-        token, password = line[0], line[1]
-        tokencombo = line[0] + ":" + line[1]
+        try:
+            line = random.choice(token_file.readlines()).split(":")
+            token, password = line[0], line[1]
+            tokencombo = line[0] + ":" + line[1]
+        except IndexError:
+            pystyle.Write.Print("\t[*] Tokens inside tokens.txt are not formatted correctly (token:password)!\n", pystyle.Colors.yellow, interval=0)
+            sys.exit(1)
 
     headers = {
         "accept": "*/*",
@@ -93,9 +96,8 @@ def verify(proxy_type, tzid=None, number=None):
             lock.release()
             data1 = {"captcha_key": captcha_token, "change_phone_reason": "user_settings_update", "phone": number}
             try: resp2 = httpx.post("https://discord.com/api/v9/users/@me/phone", json=data1, headers=headers, proxies=proxy_auth if proxy_type != "" else None)
-            except httpx.ProxyError:
-                pystyle.Write.Print("\t[-] Proxy could not connect, rerunning script... X2!\n", pystyle.Colors.red, interval=0)
-                verify(proxy_type=proxy_type)
+            except httpx.ProxyError: resp2 = httpx.post("https://discord.com/api/v9/users/@me/phone", json=data1, headers=headers, proxies=None)
+
             if json.decoder.JSONDecodeError: pass
             if resp2.status_code == 204:
                 pystyle.Write.Print("\t[+] Successfully requested verification code!\n", pystyle.Colors.green, interval=0)
@@ -115,24 +117,33 @@ def verify(proxy_type, tzid=None, number=None):
             except KeyError: pass
 
             pystyle.Write.Print("\t[*] Waiting for the SMS Code...!\n", pystyle.Colors.yellow, interval=0)
-            while resp3.json()[0]["response"] == "TZ_NUM_WAIT":
-                resp3 = httpx.get(f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}&message_to_code=1")
-                time.sleep(4)
+            timeout = time.time() + 120
+            while timeout >= time.time():
+                while resp3.json()[0]["response"] == "TZ_NUM_WAIT":
+                    resp3 = httpx.get(f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}&message_to_code=1")
+                    time.sleep(.5)
 
-            verify_code = resp3.json()[0]["msg"]
-            pystyle.Write.Print(f"\t[*] Found Verificationcode: {verify_code}, sending it to Discord...\n", pystyle.Colors.yellow, interval=0)
-            if resp3.json()[0]["response"] == "ERROR_WRONG_KEY": pass
+                if resp3.json()[0]["response"] == "TZ_NUM_ANSWER":
+                    print(f"RESP 3: {resp3.json()}")
+                    verify_code = resp3.json()[0]["msg"]
+                    pystyle.Write.Print(f"\t[*] Found Verificationcode: {verify_code}, sending it to Discord...\n", pystyle.Colors.yellow, interval=0)
+                    break
+                if resp3.json()[0]["response"] == "ERROR_WRONG_KEY": pass
+                break
+
+            if resp3.json()[0]["response"] != "TZ_NUM_ANSWER":
+                pystyle.Write.Print(f"\t[*] Timeout, couldn't get the SMS within 2 Minutes. rerunning...\n", pystyle.Colors.yellow, interval=0)
+                verify(proxy_type=proxy_type)
 
             data2 = {"phone": number, "code": verify_code}
             try: resp4 = httpx.post("https://discord.com/api/v9/phone-verifications/verify", json=data2, headers=headers, proxies=proxy_auth if proxy_type != "" else None)
             except httpx.ProxyError: resp4 = httpx.post("https://discord.com/api/v9/phone-verifications/verify", json=data2, headers=headers, proxies=None)
-
-            phone_token = resp4.json()["token"]
+            try: phone_token = resp4.json()["token"]
+            except KeyError: phone_token = None
 
             data3 = {"change_phone_reason": "user_settings_update", "password": password, "phone_token": phone_token}
             httpx.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=headers)
-            with open("files/verifiedtoken.txt", "w+") as verified_file:
-                verified_file.write(tokencombo + "\n")
+            with open("files/verifiedtoken.txt", "w+") as verified_file: verified_file.write(tokencombo + "\n")
 
             with open("files/tokens.txt", "r+") as token_file:
                 lines = token_file.readlines()
@@ -141,7 +152,6 @@ def verify(proxy_type, tzid=None, number=None):
                     if item != tokencombo: token_file.write(item)
                 token_file.truncate()
             pystyle.Write.Print("\t[+] Successfully verified Account by Phone!\n", pystyle.Colors.green, interval=0)
-            verify(proxy_type=proxy_type)
 
 if __name__ == "__main__":
     print_main_menu()
