@@ -23,13 +23,13 @@ Mass Verifing a list of discord tokens by phone.
   - Invalid Tokens will be removed and added to files/invalidtokens.txt
   - Valid Tokens will stay in the same file. Phone verified Tokens will be saved inside files/verifiedtoken.txt
 
-### FAQ - Frequently Asked Question
+### FAQ - FREQUENTLY ASKED QUESTION
 ------------------------------------
 Q: Why Accounts are being disabled after automatically adding Phone-Number?
 A: This happens, if you created the Account with always the same IP or VPN / If you use the Program with same IP & VPN a lot
 
 
-### Future Information
+### FUTURE INFORMATION
 ------------------------------------
 If you got any Issue, please ask them here on Github.
 If you want to paticipate in our Community, join our discord server: https://discord.verify.gay
