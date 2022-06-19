@@ -16,14 +16,25 @@ CAPTCHA_KEY = config["Captcha Stuff"]["Captcha Service ApiKey"]
 
 def print_main_menu(): return main_menu.logo()
 def verify(proxy_type, tzid=None, number=None):
-    lock = threading.Lock()
     with open("files/proxies.txt", "r") as proxy_file:
         proxies = proxy_file.read().splitlines()
         proxy_split = random.choice(proxies).split(":")
-        host_name, port, username, password = proxy_split[0], proxy_split[1], proxy_split[2], proxy_split[3]
-        proxy_formatted = f"{proxy_type}://{username}:{password}@{host_name}:{port}"
-        if proxy_type != "": proxy_auth = {"all://": proxy_formatted}
-        else: proxy_auth = {"all://": None}
+        try:
+            host_name, port, username, password = proxy_split[0], proxy_split[1], proxy_split[2], proxy_split[3]
+            proxy_formatted = f"{proxy_type}://{username}:{password}@{host_name}:{port}"
+            if proxy_type != "": proxy_auth = {"all://": proxy_formatted}
+            else: proxy_auth = {"all://": None}
+
+        except IndexError:
+            try:
+                host_name, port = proxy_split[0], proxy_split[1]
+                proxy_formatted = f"{proxy_type}://{host_name}:{port}"
+                if proxy_type != "": proxy_auth = {"all://": proxy_formatted}
+                else: proxy_auth = {"all://": None}
+
+            except IndexError:
+                pystyle.Write.Print("\t[*] Proxies inside files/proxies.txt are not formatted correctly (IP:PORT or IP:PORT:USER:PASS)!\n", pystyle.Colors.yellow, interval=0)
+                proxy_auth = {"all://": None}
 
     with open("files/tokens.txt", "r+") as token_file:
         try:
@@ -70,6 +81,7 @@ def verify(proxy_type, tzid=None, number=None):
             verify(proxy_type=proxy_type)
 
     except KeyError:
+        lock = threading.Lock()
         if "id" in check_token.json():
             pystyle.Write.Print(f"\t[+] Valid Token {token}!\n", pystyle.Colors.green, interval=0)
             resp1 = httpx.get(f"https://onlinesim.ru/api/getNum.php?apikey={APIKEY}&service=discord&number=true&country={COUNTRY}")
@@ -103,37 +115,49 @@ def verify(proxy_type, tzid=None, number=None):
                 pystyle.Write.Print("\t[+] Successfully requested verification code!\n", pystyle.Colors.green, interval=0)
             time.sleep(4)
 
-            resp3 = httpx.get(f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}&message_to_code=1")
-            try:
-                if resp3.json()[0]["response"] == "WARNING_NO_NUMS": pystyle.Write.Print("[*] No matching numbers found!\n", pystyle.Colors.yellow, interval=0)
-                elif resp3.json()[0]["response"] == "TZ_INPOOL": ppystyle.Write.Print("[*] Waiting for a number to be dedicated to the operation!\n", pystyle.Colors.yellow, interval=0)
-                elif resp3.json()[0]["response"] == "TZ_NUM_ANSWER": pystyle.Write.Print("[*] SMS Code has arrived!\n", pystyle.Colors.yellow, interval=0)
-                elif resp3.json()[0]["response"] == "TZ_OVER_EMPTY": pystyle.Write.Print("[*] SMS Code did not arrive within the specified time!\n", pystyle.Colors.yellow, interval=0)
-                elif resp3.json()[0]["response"] == "TZ_OVER_OK": pystyle.Write.Print("[*] The operation has been completed!\n", pystyle.Colors.yellow, interval=0)
-                elif resp3.json()[0]["response"] == "ERROR_NO_TZID": pystyle.Write.Print("[*] The tzid is not specified!\n", pystyle.Colors.yellow, interval=0)
-                elif resp3.json()[0]["response"] == "ERROR_NO_OPERATIONS": pystyle.Write.Print("[*] No operations found!\n", pystyle.Colors.yellow, interval=0)
-                elif resp3.json()[0]["response"] == "ACCOUNT_IDENTIFICATION_REQUIRED": pystyle.Write.Print("You have to go through an identification process: to order a messenger - in any way, for forward - on the passport!\n", pystyle.Colors.yellow, interval=0)
 
-            except KeyError: pass
+            def wait_sms():
+                resp3 = httpx.get(
+                    f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}&message_to_code=1")
+                try:
+                    if resp3.json()[0]["response"] == "WARNING_NO_NUMS": pystyle.Write.Print("[*] No matching numbers found!\n", pystyle.Colors.yellow, interval=0)
+                    elif resp3.json()[0]["response"] == "TZ_INPOOL": pystyle.Write.Print("[*] Waiting for a number to be dedicated to the operation!\n", pystyle.Colors.yellow, interval=0)
+                    elif resp3.json()[0]["response"] == "TZ_NUM_ANSWER": pystyle.Write.Print("[*] SMS Code has arrived!\n", pystyle.Colors.yellow, interval=0)
+                    elif resp3.json()[0]["response"] == "TZ_OVER_EMPTY": pystyle.Write.Print("[*] SMS Code did not arrive within the specified time!\n", pystyle.Colors.yellow, interval=0)
+                    elif resp3.json()[0]["response"] == "TZ_OVER_OK": pystyle.Write.Print("[*] The operation has been completed!\n", pystyle.Colors.yellow, interval=0)
+                    elif resp3.json()[0]["response"] == "ERROR_NO_TZID": pystyle.Write.Print("[*] The tzid is not specified!\n", pystyle.Colors.yellow, interval=0)
+                    elif resp3.json()[0]["response"] == "ERROR_NO_OPERATIONS": pystyle.Write.Print("[*] No operations found!\n", pystyle.Colors.yellow, interval=0)
+                    elif resp3.json()[0]["response"] == "ACCOUNT_IDENTIFICATION_REQUIRED": pystyle.Write.Print("You have to go through an identification process: to order a messenger - in any way, for forward - on the passport!\n", pystyle.Colors.yellow, interval=0)
 
-            pystyle.Write.Print("\t[*] Waiting for the SMS Code...!\n", pystyle.Colors.yellow, interval=0)
-            timeout = time.time() + 120
-            while timeout >= time.time():
-                while resp3.json()[0]["response"] == "TZ_NUM_WAIT":
-                    resp3 = httpx.get(f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}&message_to_code=1")
-                    time.sleep(.5)
+                except KeyError: pass
+                pystyle.Write.Print("\t[*] Waiting for the SMS Code...!\n", pystyle.Colors.yellow, interval=0)
+                timeout = time.time() + 120
+                try:
+                    while timeout >= time.time():
+                        while resp3.json()[0]["response"] == "TZ_NUM_WAIT":
+                            resp3 = httpx.get(f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}&message_to_code=1")
+                            time.sleep(.5)
 
-                if resp3.json()[0]["response"] == "TZ_NUM_ANSWER":
-                    print(f"RESP 3: {resp3.json()}")
-                    verify_code = resp3.json()[0]["msg"]
-                    pystyle.Write.Print(f"\t[*] Found Verificationcode: {verify_code}, sending it to Discord...\n", pystyle.Colors.yellow, interval=0)
-                    break
-                if resp3.json()[0]["response"] == "ERROR_WRONG_KEY": pass
-                break
+                        if resp3.json()[0]["response"] == "TZ_NUM_ANSWER":
+                            global verify_code
+                            verify_code = resp3.json()[0]["msg"]
+                            pystyle.Write.Print(f"\t[*] Found Verificationcode: {verify_code}, sending it to Discord...\n", pystyle.Colors.yellow, interval=0)
+                            break
+                        if resp3.json()[0]["response"] == "ERROR_WRONG_KEY": pass
+                        break
 
-            if resp3.json()[0]["response"] != "TZ_NUM_ANSWER":
-                pystyle.Write.Print(f"\t[*] Timeout, couldn't get the SMS within 2 Minutes. rerunning...\n", pystyle.Colors.yellow, interval=0)
-                verify(proxy_type=proxy_type)
+                except KeyError:
+                    if resp3.json()["response"] == "TRY_AGAIN_LATER":
+                        pystyle.Write.Print(f"\t[*] Temporarily unable to perform the request!\n", pystyle.Colors.yellow, interval=0)
+                        time.sleep(4)
+                        wait_sms()
+                        # timeout = time.time() + 30
+                        # while timeout >= time.time(): wait_sms()
+
+                if resp3.json()[0]["response"] != "TZ_NUM_ANSWER":
+                    pystyle.Write.Print(f"\t[*] Timeout, couldn't get the SMS within 2 Minutes. rerunning...\n", pystyle.Colors.yellow, interval=0)
+                    verify(proxy_type=proxy_type)
+            wait_sms()
 
             data2 = {"phone": number, "code": verify_code}
             try: resp4 = httpx.post("https://discord.com/api/v9/phone-verifications/verify", json=data2, headers=headers, proxies=proxy_auth if proxy_type != "" else None)
