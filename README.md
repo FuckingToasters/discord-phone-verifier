@@ -28,8 +28,8 @@ Mass Verifing a list of discord tokens by phone.
 Q: Why Accounts are being disabled after automatically adding Phone-Number?
 A: This happens, if you created the Account with always the same IP or VPN / If you use the Program with same IP & VPN a lot
 
-Q: WHy i get a invalid sitekey error?
-A: Sometimes the Sitekey change and is not always up to date with this repo. You need to get new new current sitekey by following the steps below:
+Q: Why i get a invalid sitekey error?
+A: You need to get a new sitekey by following the steps below:
    - find a account, which require a captcha to be solved when joining servers or make one.
    - open developertools (F12)  and navigate to the Elements Tab
    - Prentent to join a server so the captcha shows up
