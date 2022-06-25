@@ -151,7 +151,7 @@ def verify(proxy_type, tzid=None, number=None):
 
                             data3 = {"change_phone_reason": "user_settings_update", "password": password, "phone_token": phone_token}
                             httpx.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=headers)
-                            with open("files/verifiedtoken.txt", "a+") as verified_file: verified_file.write(tokencombo + "\n")
+                            with open("files/verifiedtoken.txt", "a+") as verified_file: verified_file.write(tokencombo)
 
                             with open("files/tokens.txt", "a+") as token_file:
                                 lines = token_file.readlines()
