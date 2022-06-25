@@ -1,7 +1,8 @@
 {
   "Captcha Stuff": {
     "Captcha Service": "capmonster",
-    "Captcha Service ApiKey": ""
+    "Captcha Service ApiKey": "",
+    "Site Key": "a9b5fb07-92ff-493f-86fe-352a2803b3df"
   },
 
   "Phone Stuff": {
