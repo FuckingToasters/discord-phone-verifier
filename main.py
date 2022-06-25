@@ -13,6 +13,7 @@ APIKEY = config["Phone Stuff"]["Phone Service ApiKey"]
 COUNTRY = config["Phone Stuff"]["Phone Country ID"]
 CAPTCHA_SERVICE = config["Captcha Stuff"]["Captcha Service"]
 CAPTCHA_KEY = config["Captcha Stuff"]["Captcha Service ApiKey"]
+SITE_KEY = config["Captcha Stuff"]["Site Key"]
 
 def print_main_menu(): return main_menu.logo()
 def verify(proxy_type, tzid=None, number=None):
@@ -73,7 +74,7 @@ def verify(proxy_type, tzid=None, number=None):
                 invalid_file.write(tokencombo)
                 pystyle.Write.Print(f"[-] Invalid Token: {token}!\n", pystyle.Colors.red, interval=0)
 
-            with open("files/tokens.txt", "r+") as token_file:
+            with open("files/tokens.txt", "a+") as token_file:
                 lines = token_file.readlines()
                 token_file.seek(0)
                 for item in lines:
@@ -92,8 +93,9 @@ def verify(proxy_type, tzid=None, number=None):
                 time.sleep(4)
 
             if "tzid" in resp1.json():
-                pystyle.Write.Print(f"\t[+] Sucessfully got a Number from https://onlinesim.ru!\n", pystyle.Colors.green, interval=0)
                 tzid, number = resp1.json()["tzid"], resp1.json()["number"]
+                pystyle.Write.Print(f"\t[+] Sucessfully got Number {number} from https://onlinesim.ru!\n", pystyle.Colors.green, interval=0)
+
             lock.acquire()
             if resp1.json()["response"] == "ACCOUNT_BLOCKED": pystyle.Write.Print(f"[-] Your Account has been blocked. Please create a new onlinesim account & use your new API Key!\n", pystyle.Colors.red, interval=0), sys.exit(1)
             elif resp1.json()["response"] == "ERROR_WRONG_KEY": pystyle.Write.Print("[-] Wrong api key provided!\n", pystyle.Colors.red, interval=0), sys.exit(1)
@@ -103,17 +105,18 @@ def verify(proxy_type, tzid=None, number=None):
             elif resp1.json()["response"] == "API_ACCESS_DISABLED": pystyle.Write.Print("[-] Your API Access has been disabled!\n", pystyle.Colors.red, interval=0), sys.exit(1)
             elif resp1.json()["response"] == "API_ACCESS_IP": pystyle.Write.Print("[-] The Access from this IP has been disabled in your Profile!\n", pystyle.Colors.red, interval=0), sys.exit(1)
             elif resp1.json()["response"] == "WARNING_LOW_BALANCE": pystyle.Write.Print("[-] This order can't be placed, the Account Balance is too low!\n", pystyle.Colors.red, interval=0), sys.exit(1)
+
             pystyle.Write.Print("\t[*] Solving captcha... please be patient!\n", pystyle.Colors.yellow, interval=0)
-            solver = captchatools.captcha_harvesters(solving_site=CAPTCHA_SERVICE, api_key=CAPTCHA_KEY, sitekey="f5561ba9-8f1e-40ca-9b5b-a0b3f719ef34", captcha_url="https://discord.com/api/v9/users/@me/phone")
+            solver = captchatools.captcha_harvesters(solving_site=CAPTCHA_SERVICE, api_key=CAPTCHA_KEY, sitekey=SITE_KEY, captcha_url="https://discord.com/api/v9/users/@me/phone")
             captcha_token = solver.get_token()
             lock.release()
+
             data1 = {"captcha_key": captcha_token, "change_phone_reason": "user_settings_update", "phone": number}
             try: resp2 = httpx.post("https://discord.com/api/v9/users/@me/phone", json=data1, headers=headers, proxies=proxy_auth if proxy_type != "" else None)
             except httpx.ProxyError: resp2 = httpx.post("https://discord.com/api/v9/users/@me/phone", json=data1, headers=headers, proxies=None)
 
             if json.decoder.JSONDecodeError: pass
             if resp2.status_code == 204: pystyle.Write.Print("\t[+] Successfully requested verification code!\n", pystyle.Colors.green, interval=0)
-            time.sleep(4)
 
             def wait_sms():
                 resp3 = httpx.get(f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}&message_to_code=1")
@@ -126,8 +129,8 @@ def verify(proxy_type, tzid=None, number=None):
                     elif resp3.json()[0]["response"] == "ERROR_NO_TZID": pystyle.Write.Print("[*] The tzid is not specified!\n", pystyle.Colors.yellow, interval=0)
                     elif resp3.json()[0]["response"] == "ERROR_NO_OPERATIONS": pystyle.Write.Print("[*] No operations found!\n", pystyle.Colors.yellow, interval=0)
                     elif resp3.json()[0]["response"] == "ACCOUNT_IDENTIFICATION_REQUIRED": pystyle.Write.Print("You have to go through an identification process: to order a messenger - in any way, for forward - on the passport!\n", pystyle.Colors.yellow, interval=0)
-
                 except KeyError: pass
+
                 pystyle.Write.Print("\t[*] Waiting for the SMS Code...!\n", pystyle.Colors.yellow, interval=0)
                 timeout = time.time() + 120
                 try:
@@ -148,14 +151,14 @@ def verify(proxy_type, tzid=None, number=None):
 
                             data3 = {"change_phone_reason": "user_settings_update", "password": password, "phone_token": phone_token}
                             httpx.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=headers)
-                            with open("files/verifiedtoken.txt", "w+") as verified_file: verified_file.write(tokencombo + "\n")
+                            with open("files/verifiedtoken.txt", "a+") as verified_file: verified_file.write(tokencombo + "\n")
 
-                            with open("files/tokens.txt", "r+") as token_file:
+                            with open("files/tokens.txt", "a+") as token_file:
                                 lines = token_file.readlines()
                                 for item in lines:
                                     if item != tokencombo: token_file.write(item)
                                 token_file.truncate()
-                            pystyle.Write.Print("\t[+] Successfully verified Account by Phone!\n", pystyle.Colors.green, interval=0)
+                            pystyle.Write.Print(f"\t[+] Successfully verified {token} with {number}!\n", pystyle.Colors.green, interval=0)
                         if resp3.json()[0]["response"] == "ERROR_WRONG_KEY": pass
                         break
 
@@ -163,12 +166,8 @@ def verify(proxy_type, tzid=None, number=None):
                     if resp3.json()["response"] == "TRY_AGAIN_LATER":
                         timeout = time.time() + 30
                         pystyle.Write.Print(f"\t[*] Temporarily unable to perform the request, retrying for 30 Seconds...!\n", pystyle.Colors.yellow, interval=0)
-                        while timeout >= time.time(): wait_sms() # try to get a new sms for 30 seconds
-                        while timeout < time.time(): verify(proxy_type=proxy_type) # if 30 seconds have passed, run the script again in the same thread (use sys.exit(1) to stop it)
-                        
-
-                            # timeout = time.time() + 30
-                            # while timeout >= time.time(): wait_sms()
+                        while timeout >= time.time(): time.sleep(.5), wait_sms() # try to get a new sms for 30 seconds
+                        while timeout < time.time(): verify(proxy_type=proxy_type) # if 30 seconds have passed, run the script again in the same thread (remove this line to exit the loop)
 
                 if resp3.json()[0]["response"] != "TZ_NUM_ANSWER":
                     pystyle.Write.Print(f"\t[*] Timeout, couldn't get the SMS within 2 Minutes. rerunning...\n", pystyle.Colors.yellow, interval=0)
@@ -177,8 +176,8 @@ def verify(proxy_type, tzid=None, number=None):
 
 if __name__ == "__main__":
     print_main_menu()
-    session_input = pystyle.Write.Input("[**] How many concurrent Threads do you want to use?: ", pystyle.Colors.cyan, interval=0)
-    proxy_input = pystyle.Write.Input("    [**] Proxy Type (http/https/socks5) | Enter nothing to use without Proxy: ", pystyle.Colors.cyan, interval=0)
+    session_input = pystyle.Write.Input("\t[**] How many concurrent Threads do you want to use?: ", pystyle.Colors.cyan, interval=0)
+    proxy_input = pystyle.Write.Input("\t    [**] Proxy Type (http/https/socks5) | Enter nothing to use without Proxy: ", pystyle.Colors.cyan, interval=0)
     if proxy_input == "https": proxy_input = "http"
     threads = []
     try:
