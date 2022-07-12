@@ -40,6 +40,15 @@ A: You need to get a new sitekey by following the steps below:
    - use `ctrl + f` to search for the keyword `sitekey`
    - copy paste the sitekey inside the correct place in files/config.json
 
+### PSS - Phone Service Suggestions
+------------------------------------
+Supported Services (https://onlinesim.io, more soon)
+Depending on the Service you use, different countries have different prices.
+https://sms-activate.ru & https://5sim.com are the most expencive ones out there and are not recommended by me.
+On https://onlinesim.io the cheapest numbers for discord on various countries cost $0.05 (Estonia & More)
+On https://smspva.com Hongkong is a good Country to choose, which also cost $0.05
+
+
 ### FUTURE INFORMATION
 ------------------------------------
 If you got any Issue, please ask them here on Github.
