@@ -40,7 +40,7 @@ A: You need to get a new sitekey by following the steps below:
    - use `ctrl + f` to search for the keyword `sitekey`
    - copy paste the sitekey inside the correct place in files/config.json
 
-### PSS - Phone Service Suggestions
+### PSS - PHONE SERVICE SUGGESTIONS
 ------------------------------------
 Supported Services (https://onlinesim.io, more soon)
 Depending on the Service you use, different countries have different prices.
