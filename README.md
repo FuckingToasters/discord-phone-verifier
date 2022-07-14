@@ -34,9 +34,9 @@ A: It happens,
 
 Q: Why i get a invalid sitekey error?
 A: You need to get a new sitekey by following the steps below:
-   - find a account, which require a captcha to be solved when joining servers or make one.
+   - find a account, which require a captcha to be solved when adding a phone-number to the account.
    - open developertools (F12)  and navigate to the Elements Tab
-   - Prentent to join a server so the captcha shows up
+   - Add a Phonenumber Manually so the captcha shows up
    - use `ctrl + f` to search for the keyword `sitekey`
    - copy paste the sitekey inside the correct place in files/config.json
 
