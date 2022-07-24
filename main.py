@@ -17,6 +17,10 @@ SITE_KEY = config["Captcha Stuff"]["Site Key"]
 
 def print_main_menu(): return main_menu.logo()
 def verify(proxy_type, tzid=None, number=None):
+    if CAPTCHA_SERVICE == "capmonster":
+        pystyle.Write.Print("\t[-] Seems like you are using capmonster. Please change the Captcha Service in files/config.json (Capmonster is flagged)!\n", pystyle.Colors.red, interval=0)
+        sys.exit(69)
+        
     with open("files/proxies.txt", "r") as proxy_file:
         proxies = proxy_file.read().splitlines()
         proxy_split = random.choice(proxies).split(":")
@@ -52,7 +56,6 @@ def verify(proxy_type, tzid=None, number=None):
         "accept-language": "en-US,en;q=0.9",
         "authorization": token,
         "content-type": "application/json",
-        "cookie": "__dcfduid=8390e660ee1811ec8d3b1b6a623c7dd4; __sdcfduid=8390e661ee1811ec8d3b1b6a623c7dd4e5aec00daf4eabeda71b40dd60c7012044b50d1e3da920dd20ccda5cce8e7dba; locale=en-US,en;q=0.9",
         "origin": "https://discord.com",
         "referer": "https://discord.com/channels/@me",
         "sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="100", "Google Chrome";v="100"',
