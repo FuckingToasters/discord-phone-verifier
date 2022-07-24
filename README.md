@@ -40,6 +40,9 @@ A: You need to get a new sitekey by following the steps below:
    - use `ctrl + f` to search for the keyword `sitekey`
    - copy paste the sitekey inside the correct place in files/config.json
 
+Q: Why the SMS Code never appears?
+A: The Captcha Solver you are using is flagged. Use another one. 2captcha works fine
+
 ### PSS - PHONE SERVICE SUGGESTIONS
 ------------------------------------
 Supported Services (https://onlinesim.io, more soon)
