@@ -185,7 +185,7 @@ def verify(proxy_type, tzid=None, number=None):
 if __name__ == "__main__":
     print_main_menu()
     session_input = pystyle.Write.Input("\t[**] How many concurrent Threads do you want to use?: ", pystyle.Colors.cyan, interval=0)
-    proxy_input = pystyle.Write.Input("\t    [**] Proxy Type (http/https/socks5) | Enter nothing to use without Proxy: ", pystyle.Colors.cyan, interval=0)
+    proxy_input = pystyle.Write.Input("\t[**] Proxy Type (http/https/socks5) | Enter nothing to use without Proxy: ", pystyle.Colors.cyan, interval=0)
     if proxy_input == "https": proxy_input = "http"
     threads = []
     try:
