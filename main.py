@@ -23,7 +23,9 @@ def verify(proxy_type, tzid=None, number=None):
         
     with open("files/proxies.txt", "r") as proxy_file:
         proxies = proxy_file.read().splitlines()
-        proxy_split = random.choice(proxies).split(":")
+        proxy_split = "None"
+        for proxy in proxies:
+            proxy_split = proxy.split(":")
         try:
             host_name, port, username, password = proxy_split[0], proxy_split[1], proxy_split[2], proxy_split[3]
             proxy_formatted = f"{proxy_type}://{username}:{password}@{host_name}:{port}"
@@ -43,7 +45,10 @@ def verify(proxy_type, tzid=None, number=None):
 
     with open("files/tokens.txt", "r+") as token_file:
         try:
-            line = random.choice(token_file.readlines()).split(":")
+            lines = token_file.read().splitlines()
+            line = "None"
+            for line in lines:
+                line = line.split(":")
             token, password = line[0], line[1]
             tokencombo = line[0] + ":" + line[1]
         except IndexError:
@@ -110,7 +115,7 @@ def verify(proxy_type, tzid=None, number=None):
             elif resp1.json()["response"] == "WARNING_LOW_BALANCE": pystyle.Write.Print("[-] This order can't be placed, the Account Balance is too low!\n", pystyle.Colors.red, interval=0), sys.exit(1)
 
             pystyle.Write.Print("\t[*] Solving captcha... please be patient!\n", pystyle.Colors.yellow, interval=0)
-            solver = captchatools.captcha_harvesters(solving_site=CAPTCHA_SERVICE, api_key=CAPTCHA_KEY, sitekey=SITE_KEY, captcha_url="https://discord.com/api/v9/users/@me/phone")
+            solver = captchatools.captcha_harvesters(solving_site=CAPTCHA_SERVICE, api_key=CAPTCHA_KEY, captcha_type="hcaptcha", sitekey=SITE_KEY, captcha_url="https://discord.com/api/v9/users/@me/phone")
             captcha_token = solver.get_token()
             lock.release()
 
