@@ -1,4 +1,6 @@
 httpx
 httpx[socks]
 captchatools
+invisifox
 pystyle
+brotlipy
