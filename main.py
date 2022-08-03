@@ -5,8 +5,10 @@ import captchatools
 import sys
 import random
 import pystyle
+import logging
 import threading
 from plugins import main_menu
+from invisifox import InvisiFox
 
 with open("files/config.json") as conf: config = json.load(conf)
 APIKEY = config["Phone Stuff"]["Phone Service ApiKey"]
@@ -17,9 +19,6 @@ SITE_KEY = config["Captcha Stuff"]["Site Key"]
 
 def print_main_menu(): return main_menu.logo()
 def verify(proxy_type, tzid=None, number=None):
-    if CAPTCHA_SERVICE == "capmonster":
-        pystyle.Write.Print("\t[-] Seems like you are using capmonster. Please change the Captcha Service in files/config.json (Capmonster is flagged)!\n", pystyle.Colors.red, interval=0)
-        sys.exit(69)
         
     with open("files/proxies.txt", "r") as proxy_file:
         proxies = proxy_file.read().splitlines()
@@ -113,10 +112,22 @@ def verify(proxy_type, tzid=None, number=None):
             elif resp1.json()["response"] == "API_ACCESS_DISABLED": pystyle.Write.Print("[-] Your API Access has been disabled!\n", pystyle.Colors.red, interval=0), sys.exit(1)
             elif resp1.json()["response"] == "API_ACCESS_IP": pystyle.Write.Print("[-] The Access from this IP has been disabled in your Profile!\n", pystyle.Colors.red, interval=0), sys.exit(1)
             elif resp1.json()["response"] == "WARNING_LOW_BALANCE": pystyle.Write.Print("[-] This order can't be placed, the Account Balance is too low!\n", pystyle.Colors.red, interval=0), sys.exit(1)
-
+            
             pystyle.Write.Print("\t[*] Solving captcha... please be patient!\n", pystyle.Colors.yellow, interval=0)
-            solver = captchatools.captcha_harvesters(solving_site=CAPTCHA_SERVICE, api_key=CAPTCHA_KEY, captcha_type="hcaptcha", sitekey=SITE_KEY, captcha_url="https://discord.com/api/v9/users/@me/phone")
-            captcha_token = solver.get_token()
+            if CAPTCHA_SERVICE != "invisifox".lower():
+                solver = captchatools.captcha_harvesters(solving_site=CAPTCHA_SERVICE, api_key=CAPTCHA_KEY, captcha_type="hcaptcha", sitekey=SITE_KEY, captcha_url="https://discord.com/api/v9/users/@me/phone")
+                captcha_token = solver.get_token()
+            
+            elif CAPTCHA_SERVICE == "invisifox".lower():
+                solver = InvisiFox()
+                solver.apiKey = CAPTCHA_KEY
+                if proxy_type == "": pystyle.Write.Print("\t[-] You need to use Proxies when using invisifox Solver!\n", pystyle.Colors.red, interval=0), sys.exit(69)
+                try:
+                    captcha_token = solver.solveHCaptcha(SITE_KEY,'https://discord.com', proxy_formatted)
+                    print(captcha_token)
+                except Exception:
+                    pystyle.Write.Print("\t[-] Couldn't solve the Captcha. Invisifox is still in development and this issue is caused by Invisifox. The Owner might get it fixed later!\n", pystyle.Colors.red, interval=0), sys.exit(69)
+            
             lock.release()
 
             data1 = {"captcha_key": captcha_token, "change_phone_reason": "user_settings_update", "phone": number}
@@ -177,6 +188,8 @@ def verify(proxy_type, tzid=None, number=None):
                         while timeout >= time.time(): time.sleep(.5), wait_sms() # try to get a new sms for 30 seconds
                         while timeout < time.time(): verify(proxy_type=proxy_type) # if 30 seconds have passed, run the script again in the same thread (remove this line to exit the loop)
 
+                if resp3.json()["response"] == "ERROR_NO_OPERATIONS":
+                    pystyle.Write.Print(f"\t[-] No Numbers with the countrycode {COUNTRY} found. Change the Countrycode inside files/config.json!\n", pystyle.Colors.red, interval=0), sys.exit(69)
                 if resp3.json()[0]["response"] != "TZ_NUM_ANSWER":
                     pystyle.Write.Print(f"\t[*] Timeout, couldn't get the SMS within 2 Minutes. rerunning...\n", pystyle.Colors.yellow, interval=0)
                     verify(proxy_type=proxy_type)
