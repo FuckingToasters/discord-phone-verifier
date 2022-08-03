@@ -1,11 +1,10 @@
 import httpx
 import json
 import time
+import random
 import captchatools
 import sys
-import random
 import pystyle
-import logging
 import threading
 from plugins import main_menu
 from invisifox import InvisiFox
@@ -19,7 +18,12 @@ SITE_KEY = config["Captcha Stuff"]["Site Key"]
 
 def print_main_menu(): return main_menu.logo()
 def verify(proxy_type, tzid=None, number=None):
-        
+
+    useragent = None
+    with open("files/useragents.txt") as ua_file:
+        useragents = ua_file.readlines()
+        useragent = random.choice(useragents).strip()
+
     with open("files/proxies.txt", "r") as proxy_file:
         proxies = proxy_file.read().splitlines()
         proxy_split = "None"
@@ -50,6 +54,9 @@ def verify(proxy_type, tzid=None, number=None):
                 line = line.split(":")
             token, password = line[0], line[1]
             tokencombo = line[0] + ":" + line[1]
+            if tokencombo == "N:o":
+                pystyle.Write.Print("\t[*] No Token found inside files/tokens.txt!\n", pystyle.Colors.yellow, interval=0), sys.exit(69)
+
         except IndexError:
             pystyle.Write.Print("\t[*] Tokens inside tokens.txt are not formatted correctly (token:password)!\n", pystyle.Colors.yellow, interval=0)
             sys.exit(1)
@@ -68,7 +75,7 @@ def verify(proxy_type, tzid=None, number=None):
         "sec-fetch-dest": "empty",
         "sec-fetch-mode": "cors",
         "sec-fetch-site": "same-origin",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36",
+        "user-agent": useragent,
         "x-debug-options": "bugReporterEnabled",
         "x-super-properties": "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwMC4wLjQ4OTYuNjAgU2FmYXJpLzUzNy4zNiIsImJyb3dzZXJfdmVyc2lvbiI6IjEwMC4wLjQ4OTYuNjAiLCJvc192ZXJzaW9uIjoiMTAiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTMyNjQ3LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ=="
     }
@@ -85,7 +92,7 @@ def verify(proxy_type, tzid=None, number=None):
                 lines = token_file.readlines()
                 token_file.seek(0)
                 for item in lines:
-                    if item != tokencombo: token_file.write(item)
+                    if item != tokencombo: token_file.write(f"{item}\n")
                 token_file.truncate()
             verify(proxy_type=proxy_type)
 
