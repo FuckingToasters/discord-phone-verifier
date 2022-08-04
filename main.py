@@ -151,13 +151,43 @@ def verify(proxy_type, tzid=None, number=None):
                         while resp3.json()[0]["response"] == "TZ_NUM_WAIT":
                             waitcount = waitcount + 1
                             if waitcount >= 15:
-                                pystyle.Write.Print(f"\t[-] Phone Number {number} is banned by Discord.!\n", pystyle.Colors.red, interval=0)
+                                pystyle.Write.Print(f"\t[-] Phone Number {number} is banned by Discord!\n", pystyle.Colors.red, interval=0)
                                 verify(proxy_type=proxy_type)
                                 break
                             
                             pystyle.Write.Print(f"\t[*] Discord havn't sent the SMS so far... {waitcount}/15!\n", pystyle.Colors.yellow, interval=0)
-                            client.get(f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}")
+                            resp3 = client.get(f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}")
                             time.sleep(3)
+                        
+                        try:    
+                            if resp3.json()[0]["response"] == "TZ_NUM_ANSWER":
+                                global verify_code
+                                verify_code = resp3.json()[0]["msg"]
+                                pystyle.Write.Print(f"\t[*] Found Verificationcode: {verify_code}, sending it to Discord...\n", pystyle.Colors.yellow, interval=0)
+                                data2 = {"phone": number, "code": verify_code}
+                                
+                                try: resp4 = httpx.post("https://discord.com/api/v9/phone-verifications/verify", json=data2, headers=headers, proxies=proxy_auth if proxy_type != "" else None)
+                                except httpx.ProxyError: resp4 = httpx.post("https://discord.com/api/v9/phone-verifications/verify", json=data2, headers=headers, proxies=None)
+                                try: phone_token = resp4.json()["token"]
+                                except KeyError: phone_token = None
+                                
+                                data3 = {"change_phone_reason": "user_settings_update", "password": password, "phone_token": phone_token}
+                                httpx.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=headers)
+                                
+                                with open("files/verifiedtoken.txt", "a+") as verified_file: verified_file.write(tokencombo)
+                                with open("files/tokens.txt", "a+") as token_file:
+                                    lines = token_file.readlines()
+                                    for item in lines:
+                                        if item != tokencombo: token_file.write(item)
+                                    token_file.truncate()
+                                    
+                                pystyle.Write.Print(f"\t[+] Successfully verified {token} with {number}!\n", pystyle.Colors.green, interval=0)
+                    
+                        except KeyError:
+                            if resp3.json()["response"] == "TRY_AGAIN_LATER":
+                                pystyle.Write.Print(f"\t[*] We sent too much reguests to onlinesim.io and got ratelimited...!\n", pystyle.Colors.yellow, interval=0)
+                                time.sleep(3)
+                                verify(proxy_type=proxy_type)
                     
                     except KeyError:
                         if resp3.json()["response"] == "WARNING_NO_NUMS": pystyle.Write.Print("\t[-] No matching numbers found!\n", pystyle.Colors.red, interval=0), sys.exit(69)
@@ -165,36 +195,6 @@ def verify(proxy_type, tzid=None, number=None):
                         elif resp3.json()["response"] == "ERROR_NO_OPERATIONS": pystyle.Write.Print(f"\t[-] There are no Numbers in Stock with the code {COUNTRY}. Update files/config.json!\n", pystyle.Colors.red, interval=0), sys.exit(69)
                         elif resp3.json()["response"] == "ACCOUNT_IDENTIFICATION_REQUIRED": pystyle.Write.Print("You have to go through an identification process: to order a messenger - in any way, for forward - on the passport!\n", pystyle.Colors.red, interval=0), sys.exit(69)
                         else: pystyle.Write.Print("A Unexpected Error appeared while trying to verify the Phone Number. Please open a github issue with the Error below on https://github.com/FuckingToasters/discord-phone-verifier!\n", pystyle.Colors.red, interval=0), print(resp3.json()), sys.exit(69)
-
-                    try:    
-                        if resp3.json()[0]["response"] == "TZ_NUM_ANSWER":
-                            global verify_code
-                            verify_code = resp3.json()[0]["msg"]
-                            pystyle.Write.Print(f"\t[*] Found Verificationcode: {verify_code}, sending it to Discord...\n", pystyle.Colors.yellow, interval=0)
-                            data2 = {"phone": number, "code": verify_code}
-                            
-                            try: resp4 = httpx.post("https://discord.com/api/v9/phone-verifications/verify", json=data2, headers=headers, proxies=proxy_auth if proxy_type != "" else None)
-                            except httpx.ProxyError: resp4 = httpx.post("https://discord.com/api/v9/phone-verifications/verify", json=data2, headers=headers, proxies=None)
-                            try: phone_token = resp4.json()["token"]
-                            except KeyError: phone_token = None
-                            
-                            data3 = {"change_phone_reason": "user_settings_update", "password": password, "phone_token": phone_token}
-                            httpx.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=headers)
-                            
-                            with open("files/verifiedtoken.txt", "a+") as verified_file: verified_file.write(tokencombo)
-                            with open("files/tokens.txt", "a+") as token_file:
-                                lines = token_file.readlines()
-                                for item in lines:
-                                    if item != tokencombo: token_file.write(item)
-                                token_file.truncate()
-                                
-                            pystyle.Write.Print(f"\t[+] Successfully verified {token} with {number}!\n", pystyle.Colors.green, interval=0)
-                    
-                    except KeyError:
-                        if resp3.json()["response"] == "TRY_AGAIN_LATER":
-                            pystyle.Write.Print(f"\t[*] We sent too much reguests to onlinesim.io and got ratelimited...!\n", pystyle.Colors.yellow, interval=0)
-                            time.sleep(3)
-                            verify(proxy_type=proxy_type)
             wait_sms()
 
 if __name__ == "__main__":
