@@ -41,9 +41,9 @@ A: You need to get a new sitekey by following the steps below:
    - copy paste the sitekey inside the correct place in files/config.json
 
 Q: Why the SMS Code never appears?
-A: The Captcha Solver you are using is flagged. Use another one.
-   - Currently Discord is flagging all famous solvers like 2captcha, capmonster, anticaptcha etc.
-   - If you want a working Solve, take a look here: https://invisifox.com
+A: There are two different cases where this issue may apply to.
+   - The Country of the Number you selected is banned from using Discord.
+   - You don't use a Proxy for the Solving Service. A Proxy is required if you want to mass verify tokens.
 
 ### PSS - PHONE SERVICE SUGGESTIONS
 ------------------------------------
