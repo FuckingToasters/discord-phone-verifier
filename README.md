@@ -41,7 +41,7 @@ A: You need to get a new sitekey by following the steps below:
    - copy paste the sitekey inside the correct place in files/config.json
 
 Q: Why the SMS Code never appears?
-A: There are two different cases where this issue may apply to.
+A: There are two different cases where this issue may apply to:
    - The Country of the Number you selected is banned from using Discord.
    - You don't use a Proxy for the Solving Service. A Proxy is required if you want to mass verify tokens.
 
