@@ -120,10 +120,10 @@ def verify(total_threads, thread_index, proxy_type, tzid=None, number=None):
             elif type(COUNTRY) is int: COUNTRY == str(COUNTRY)
 
         if PHONE_SERVICE == "onlinesim":
-            resp1 = httpx.get(f"https://onlinesim.ru/api/getNum.php?apikey={APIKEY}&service=discord&number=true&country={str(COUNTRY)}")
+            resp1 = httpx.get(f"https://onlinesim.ru/api/getNum.php?apikey={APIKEY}&service=discord&number=true&country={str(COUNTRY)}", proxies=proxy_auth if proxy_type != "" else None)
 
             while resp1.json()["response"] == "INTERVAL_CONCURRENT_REQUESTS_ERROR":
-                resp1 = httpx.get(f"https://onlinesim.ru/api/getNum.php?apikey={APIKEY}&service=discord&number=true&country={str(COUNTRY)}")
+                resp1 = httpx.get(f"https://onlinesim.ru/api/getNum.php?apikey={APIKEY}&service=discord&number=true&country={str(COUNTRY)}", proxies=proxy_auth if proxy_type != "" else None)
                 time.sleep(4)
             try:
                 if "tzid" or "id" in resp1.json():
@@ -162,7 +162,7 @@ def verify(total_threads, thread_index, proxy_type, tzid=None, number=None):
         def wait_sms():
             waitcount = 0
             if PHONE_SERVICE == "onlinesim":
-                resp3 = httpx.get(f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}&message_to_code=1")
+                resp3 = httpx.get(f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}&message_to_code=1", proxies=proxy_auth if proxy_type != "" else None)
                 try:
                     if resp3.json()[0]["response"] == "WARNING_NO_NUMS": pystyle.Write.Print("[*] No matching numbers found!\n", pystyle.Colors.yellow, interval=0)
                     elif resp3.json()[0]["response"] == "TZ_INPOOL": pystyle.Write.Print("[*] Waiting for a number to be dedicated to the operation!\n", pystyle.Colors.yellow, interval=0)
@@ -181,7 +181,7 @@ def verify(total_threads, thread_index, proxy_type, tzid=None, number=None):
                         break
                         
                     pystyle.Write.Print(f"\t[*] Discord havn't sent the SMS so far... {waitcount}/15!\n", pystyle.Colors.yellow, interval=0)
-                    resp3 = httpx.get(f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}&message_to_code=1")
+                    resp3 = httpx.get(f"https://onlinesim.ru/api/getState.php?apikey={APIKEY}&tzid={tzid}&message_to_code=1", proxies=proxy_auth if proxy_type != "" else None)
                     time.sleep(3)
                 
                 try:    
