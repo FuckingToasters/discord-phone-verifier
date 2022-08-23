@@ -1,10 +1,12 @@
 # Discord Phone Verifier
 Mass Verifing a list of discord tokens by phone.
 
+
 ### HOW TO INSTALL
 ------------------------------------
 - Install Python on your System (https://python.org)
 - Install the required dependencies (pip install -r requirements.txt)
+
 
 ### HOW TO SETUP
 ------------------------------------
@@ -12,6 +14,7 @@ Mass Verifing a list of discord tokens by phone.
 - Create a https://onlinesim.io account & add some funds (onlinesim is the cheapest phone provider compared to sms-activate, 5sim etc.)
 - Setup files/config.json with your information (country id is the phone code eg. 49 for Germany, 7 for Russia etc.)
 - Have your tokens ready in the format token:password (password is required)
+
 
 ### WHAT FEATURES ARE INCLUDED
 ------------------------------------
@@ -23,6 +26,7 @@ Mass Verifing a list of discord tokens by phone.
   - Invalid Tokens will be removed and added to files/invalidtokens.txt
   - Valid Tokens will stay in the same file. 
   - Phone verified Tokens will be saved inside files/verifiedtoken.txt and removed from files/tokens.txt
+
 
 ### FAQ - FREQUENTLY ASKED QUESTION
 ------------------------------------
@@ -45,13 +49,26 @@ A: There are two different cases where this issue may apply to:
    - The Country of the Number you selected is banned from using Discord.
    - You don't use a Proxy for the Solving Service. A Proxy is required if you want to mass verify tokens.
 
+
 ### PSS - PHONE SERVICE SUGGESTIONS
 ------------------------------------
 Supported Services (https://onlinesim.io, more soon)
-Depending on the Service you use, different countries have different prices.
-https://sms-activate.ru & https://5sim.com are the most expencive ones out there and are not recommended by me.
-On https://onlinesim.io the cheapest numbers for discord on various countries cost $0.05 (Estonia & More)
-On https://smspva.com Hongkong is a good Country to choose, which also cost $0.05
+
+https://vak-sms.com 
+- Cheapest Service of all time. (Phillipin Number cost 1 rub which is equal to $0.017)
+- I havn't tried the Numbers on Discord so far but i'll do when i'm at home. If it's good i'll implement it.
+
+https://onlinesim.io
+- Cheap Numbers for Discord on various countries cost $0.05 (Estonia & More)
+
+https://5sim.com
+- Different Users told me i should implement this Service because they have funds on it already. 
+- A little bit of implementation is already made but it's not fully supported.
+
+https://smspva.com
+- Hongkong is a good Country to choose, which also cost $0.05
+
+In case you know any other Service you want, just let me know. I might only implement a few and more for a paid version.
 
 
 ### FUTURE INFORMATION
