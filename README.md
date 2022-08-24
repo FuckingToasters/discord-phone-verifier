@@ -52,23 +52,11 @@ A: There are two different cases where this issue may apply to:
 
 ### PSS - PHONE SERVICE SUGGESTIONS
 ------------------------------------
-Supported Services (https://onlinesim.io, more soon)
+Supported Services (https://onlinesim.io)
 
-https://vak-sms.com 
-- Cheapest Service of all time. (Phillipin Number cost 1 rub which is equal to $0.017)
-- I havn't tried the Numbers on Discord so far but i'll do when i'm at home. If it's good i'll implement it.
-
-https://onlinesim.io
-- Cheap Numbers for Discord on various countries cost $0.05 (Estonia & More)
-
-https://5sim.com
-- Different Users told me i should implement this Service because they have funds on it already. 
-- A little bit of implementation is already made but it's not fully supported.
-
-https://smspva.com
-- Hongkong is a good Country to choose, which also cost $0.05
-
-In case you know any other Service you want, just let me know. I might only implement a few and more for a paid version.
+More Services & other Features will be implemented in a paid version of the Tool.
+The paid version is in development & won't cost too much.
+In case you know any other Service you want me to add (paid), just let me know.
 
 
 ### FUTURE INFORMATION
