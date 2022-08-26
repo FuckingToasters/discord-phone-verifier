@@ -54,10 +54,6 @@ A: There are two different cases where this issue may apply to:
 ------------------------------------
 Supported Services (https://onlinesim.io)
 
-More Services & other Features will be implemented in a paid version of the Tool.
-The paid version is in development & won't cost too much.
-In case you know any other Service you want me to add (paid), just let me know.
-
 
 ### FUTURE INFORMATION
 ------------------------------------
