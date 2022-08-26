@@ -1,6 +1,13 @@
 # Discord Phone Verifier
 Mass Verifing a list of discord tokens by phone.
 
+A paid Version is in development, in this version you can customize the Tool a lot,
+Within the paid Version a lot more Phone Servies will be supported.
+Captcha's will only be solved on tokens which require a captcha to be solved (currently a captcha solution is sent to every account you verify)
+Implement a feature which give a higher change for discord to send the verification code.
+Able to set own timeout within the config file (this is especally useful if discord send the sms after 30/30 (which is the standard timeout) is reached.
+The paid version won't cost too much.
+
 
 ### HOW TO INSTALL
 ------------------------------------
