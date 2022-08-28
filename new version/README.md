@@ -1,4 +1,10 @@
+### Why there are 2 Versions (What's the difference)
+------------------------------------
+Version1 support onlinesim only and Version2 vaksms only. Both Versions will be combined to one after i've added onlinesim support to Version 2.
+
+
 ### Configuring the Verification Tool:
+------------------------------------
 Take a look in config.json. Here the File's content with a explaination what each line does:
 ```json
 {
