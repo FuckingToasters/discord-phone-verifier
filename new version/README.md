@@ -3,10 +3,10 @@
 
 ### Adding your own Phone Service (Beginner Level)
 ------------------------------------
-To be able to add your own Service, you need to know what APIs are and how to use them in Python.
-I made the Code easy to understand with seperating things in different files.
-The Whole main.py file include specific ifstatements which are checking for the phone service used.
-This way you can use the same variable & function names & apply the same logic within this main.py file and the files inside the phoneservices folder
-Put it inside  elif and have more phone service support.
-Here a Example: if str(PHONESERVICE).lower() == "vaksms": NUMBER, TZID = vaksms.ordernumber()
-You can change the example to if str(PHONESERVICE).lower() == "other service" and add your own logic.
+- To be able to add your own Service, you need to know what APIs are and how to use them in Python.
+- I made the Code easy to understand with seperating things in different files.
+- The Whole main.py file include specific ifstatements which are checking for the phone service used.
+- This way you can use the same variable & function names & apply the same logic within this main.py file and the files inside the phoneservices folder
+- Put it inside  elif and have more phone service support.
+- Here a Example: if str(PHONESERVICE).lower() == "vaksms": NUMBER, TZID = vaksms.ordernumber()
+- You can change the example to if str(PHONESERVICE).lower() == "other service" and add your own logic.
