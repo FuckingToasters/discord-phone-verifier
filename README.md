@@ -1,14 +1,6 @@
 # Discord Phone Verifier
 Mass Verifing a list of discord tokens by phone.
 
-A paid Version is in development, in this version you can customize the Tool a lot,
-Within the paid Version a lot more Phone Servies will be supported.
-Captcha's will only be solved on tokens which require a captcha to be solved (currently a captcha solution is sent to every account you verify)
-Implement a feature which give a higher change for discord to send the verification code.
-Able to set own timeout within the config file (this is especally useful if discord send the sms after 30/30 (which is the standard timeout) is reached.
-The paid version won't cost too much.
-
-
 ### HOW TO INSTALL
 ------------------------------------
 - Install Python on your System (https://python.org)
@@ -60,6 +52,11 @@ A: There are two different cases where this issue may apply to:
 ### PSS - PHONE SERVICE SUGGESTIONS
 ------------------------------------
 Supported Services (https://onlinesim.io)
+
+I'm not sure so far if following will be added in a paid version or leaking the src for free:
+  - More Services & other Features will be implemented in a paid version of the Tool.
+  - The paid version is in development & won't cost too much.
+  - In case you know any other Service you want me to add (paid), just let me know.
 
 
 ### FUTURE INFORMATION
