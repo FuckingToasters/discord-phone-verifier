@@ -4,9 +4,9 @@ import json
 
 class vakverification:
     def __init__(self):
-        with open("../phoneconfig.json", "r") as conf: config = json.load(conf)
-        self.APIKEY = config["VAK SMS"]["API KEY"]
-        self.COUNTRY = config["VAK SMS"]["COUNTRY"]
+        with open("config.json", "r") as conf: config = json.load(conf)
+        self.APIKEY = config["PHONE STUFF"]["VAK SMS"]["API KEY"]
+        self.COUNTRY = config["PHONE STUFF"]["VAK SMS"]["COUNTRY"]
         self.BALANCE = None
         self.STOCK = None
         self.PRICE = None
