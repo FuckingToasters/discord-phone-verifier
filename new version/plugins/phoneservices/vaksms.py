@@ -76,7 +76,7 @@ class vakverification:
     def deletenumber(self):
         url = f"https://vak-sms.com/api/setStatus/?apiKey={self.APIKEY}&status=end&idNum={self.TZID}"
         response = requests.get(url).json()
-        if response["status"] != "update": pystyle.Write.Print(f"\t[*] Could not delete the Number ({response['status']})!\n", pystyle.Colors.yellow, interval=0), sys.exit(1)
+        if response["status"] != "update": pystyle.Write.Print(f"\t[*] Could not delete the Number ({response['status']})!\n", pystyle.Colors.yellow, interval=0)
 
         # with requests.Client(headers=None) as client: response = client.get(url).json()
         # if response["status"] == "update":  self.DELETED = True
