@@ -10,4 +10,4 @@
 - Put it inside  elif and have more phone service support.
 - Here a Example: if str(PHONESERVICE).lower() == "vaksms": NUMBER, TZID = vaksms.ordernumber()
 - You can change the example to elif str(PHONESERVICE).lower() == "other service" and add your own logic.
-- To fully implement a own service, you need to take a look to the already supported services in the phoneservices folder, cpy the file & andd the new API endpoints and import it to the main file in the same way like the standard Services are imported.
+- To fully implement a own service, you need to take a look to the already supported services in the phoneservices folder, copy the file & and the new API endpoints + import it to the main file in the same way like i did in the standard supported Services.
