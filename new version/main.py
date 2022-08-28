@@ -20,11 +20,6 @@ def verify(totalthreads, threadindex, proxytype):
     _, _, _, PHONESERVICE, VAKAPIKEY, _, _, _ = config().loadconfig()
     USERAGENT = randomagentclass().randomagent()
 
-    # The Whole main.py file include specific ifstatements which are checking for the phone service used.
-    # This way you can use the same variable & function names & apply the same logic within this main.py file and the files inside the phoneservices folder
-    # Put it inside  elif and have more phone service support.
-    # Here a Example: if str(PHONESERVICE).lower() == "vaksms": NUMBER, TZID = vaksms.ordernumber()
-    # You can change the example to if str(PHONESERVICE).lower() == "other service" and add your own logic.
     if str(PHONESERVICE).lower() != "vaksms":
         pystyle.Write.Print(f"\t[-] Only https://vak-sms.com is supported at the moment!\n", pystyle.Colors.red, interval=0), time.sleep(2), sys.exit(0)
 
@@ -99,9 +94,6 @@ def verify(totalthreads, threadindex, proxytype):
                     tokenfile.write(line)
         lock.acquire(), pystyle.Write.Print(f"\t[+] Successfully verified {TOKEN} with {NUMBER}!\n", pystyle.Colors.green, interval=0), lock.release()
         with open("files/failedverify.txt", "a+") as failedfile: failedfile.write(TOKENCOMBO)
-
-        if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
-
         removetoken()
         verify(totalthreads, threadindex, proxytype)
 
