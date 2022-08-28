@@ -1,0 +1,22 @@
+{
+    "CAPTCHA STUFF": {
+        "SERVICE": 2,
+        "API KEY": "",
+        "SITE KEY": ""
+
+    },
+
+    "PHONE STUFF": {
+        "SERVICE": "VAKSMS",
+		
+        "VAKSMS": {
+            "API KEY" : "",
+            "COUNTRY" : "phillipines"
+        },
+    
+        "ONLINESIM": {
+            "API KEY": "",
+            "COUNTRY": "372"
+        }
+    }
+}
