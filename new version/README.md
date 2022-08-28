@@ -1,5 +1,5 @@
 ### Configuring the Verification Tool:
-Take a look in config.json. Here the Fil's content with a explaination what each line does:
+Take a look in config.json. Here the File's content with a explaination what each line does:
 ```json
 {
     "CAPTCHA STUFF": {
