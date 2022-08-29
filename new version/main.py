@@ -93,7 +93,6 @@ def verify(totalthreads, threadindex, proxytype):
                 if line.strip("\n") != TOKENCOMBO:
                     tokenfile.write(line)
         lock.acquire(), pystyle.Write.Print(f"\t[+] Successfully verified {TOKEN} with {NUMBER}!\n", pystyle.Colors.green, interval=0), lock.release()
-        with open("files/failedverify.txt", "a+") as failedfile: failedfile.write(TOKENCOMBO)
         removetoken()
         verify(totalthreads, threadindex, proxytype)
 
