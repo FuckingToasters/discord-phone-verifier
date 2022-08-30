@@ -118,7 +118,7 @@ def verify(totalthreads, threadindex, proxytype):
         discordresponse = httpx.get(discordurl, headers=HEADERS, proxies=proxyauth if proxytype != "" else None).json()
         while smsresponse["smsCode"] is None: 
             waitcount = waitcount + 1
-            lock.acquire(), pystyle.Write.Print(f"\t[*] Discord havn't sent the SMS so far... {waitcount}/1200!\n", pystyle.Colors.yellow, interval=0), lock.release()
+            lock.acquire(), pystyle.Write.Print(f"\t[*] Discord havn't sent the SMS so far... {waitcount}/60!\n", pystyle.Colors.yellow, interval=0), lock.release()
             smsresponse = httpx.get(smsurl, headers=None).json()
             time.sleep(.5)
             
@@ -127,7 +127,7 @@ def verify(totalthreads, threadindex, proxytype):
                 discordurl = "https://discord.com/api/v9/users/@me/phone"
                 discordresponse = httpx.post(discordurl, json=data, headers=HEADERS, proxies=proxyauth if proxytype != "" else None)
             
-            if waitcount >= 1200:
+            if waitcount >= 60:
                 lock.acquire()
                 pystyle.Write.Print(f"\t[-] Discord did not sent a SMS to {NUMBER} in time! Check the Token & Proxy Quality\n", pystyle.Colors.red, interval=0)
                 with open("files/failedverify.txt", "a+") as failedfile: failedfile.write(TOKENCOMBO)
