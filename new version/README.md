@@ -1,18 +1,26 @@
 ### Why there are 2 Versions (What's the difference)
 ------------------------------------
-Version1:
-Support onlinesim only
-Code Design is messed up (everything in 1 file and not completed)
-Threads exit after 1 verification
-If running verify function in same Thread again, sam Token will be used
+#### Version1:
+> Support onlinesim only
 
-Version2:
-Support vaksms only.
-Code is split in different files, making it easy to reproduce for People's who are intrested in the Code
-Threads execute the verify function in itself without using the same Token & same Number
-Higher Chance for Discord to send the SMS Code (stopped discord being lazy af)
-Numbers who havn't gotten the SMS in time will be delted from site (avoding discord send sms afterwards which'll use unncececary baöance for a code you didn't used)
-A lot more improvments & still in development
+> Code Design is messed up (everything in 1 file and not completed)
+
+> Threads exit after 1 verification
+
+> If running verify function in same Thread again, sam Token will be used
+
+#### Version2:
+> Support vaksms only.
+
+> Code is split in different files, making it easy to reproduce for People's who are intrested in the Code
+
+> Threads execute the verify function in itself without using the same Token & same Number
+
+> Higher Chance for Discord to send the SMS Code (stopped discord being lazy af)
+
+> Numbers who havn't gotten the SMS in time will be delted from site (avoding discord send sms afterwards which'll use unncececary baöance for a code you > didn't used)
+
+> A lot more improvments & still in development
 
 ### Configuring the Verification Tool:
 ------------------------------------
