@@ -111,25 +111,31 @@ def verify(totalthreads, threadindex, proxytype):
 
     def waitsms():
         waitcount = 0
-        if str(PHONESERVICE).lower() == "vaksms": url = f"https://vak-sms.com/api/getSmsCode/?apiKey={VAKAPIKEY}&idNum={TZID}"
-
-        response = httpx.get(url, headers=None).json()
-        while response["smsCode"] is None: 
+        if str(PHONESERVICE).lower() == "vaksms": smsurl = f"https://vak-sms.com/api/getSmsCode/?apiKey={VAKAPIKEY}&idNum={TZID}"
+        discordurl = "https://discord.com/api/v9/users/@me/phone"
+        
+        smsresponse = httpx.get(smsurl, headers=None).json()
+        discordresponse = httpx.get(discordurl, headers=HEADERS, proxies=proxyauth if proxytype != "" else None).json()
+        while smsresponse["smsCode"] is None: 
             waitcount = waitcount + 1
-            lock.acquire(), pystyle.Write.Print(f"\t[*] Discord havn't sent the SMS so far... {waitcount}/35!\n", pystyle.Colors.yellow, interval=0), lock.release()
-            response = httpx.get(url, headers=None).json()
+            lock.acquire(), pystyle.Write.Print(f"\t[*] Discord havn't sent the SMS so far... {waitcount}/1200!\n", pystyle.Colors.yellow, interval=0), lock.release()
+            smsresponse = httpx.get(smsurl, headers=None).json()
             time.sleep(.5)
-
-            if waitcount >= 35:
+            
+            if waitcount % 5 == 0: # run every x time to request a new sms from discord
+                data = {"phone": NUMBER, "change_phone_reason": "user_settings_update"}
+                discordurl = "https://discord.com/api/v9/users/@me/phone"
+                discordresponse = httpx.post(discordurl, json=data, headers=HEADERS, proxies=proxyauth if proxytype != "" else None)
+            
+            if waitcount >= 1200:
                 lock.acquire()
                 pystyle.Write.Print(f"\t[-] Discord did not sent a SMS to {NUMBER} in time! Check the Token & Proxy Quality\n", pystyle.Colors.red, interval=0)
                 with open("files/failedverify.txt", "a+") as failedfile: failedfile.write(TOKENCOMBO)
                 removetoken()
                 if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
-
                 verify(totalthreads, threadindex, proxytype)
 
-        verifycode = response["smsCode"]
+        verifycode = smsresponse["smsCode"]
         return verifycode
     VERIFYCODE = waitsms()
 
