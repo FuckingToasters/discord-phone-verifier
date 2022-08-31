@@ -56,5 +56,3 @@ Take a look in config.json. Here the File's content with a explaination what eac
 > Check the Quality of your Tokens & your proxies
 
 > If the Quality is good, then change the country from the phonesrvice in config.json
-
-> I've used phillipines on vaksms (cheapest) but at one point it was out of stock so i tried Indonesia which worked better & higher successrate.
