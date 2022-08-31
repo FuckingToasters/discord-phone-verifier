@@ -4,6 +4,7 @@ import time
 import sys
 import pystyle
 import threading
+import colorama
 from plugins.design import mainmenu
 from plugins.filesupport.proxy import loadproxyclass
 from plugins.filesupport.useragent import randomagentclass
@@ -13,6 +14,9 @@ from plugins.configuration.load import config
 
 def print_main_menu(): return mainmenu.logo()
 def verify(totalthreads, threadindex, proxytype):
+    # timeout = httpx.TimeoutConfig(connect_timeout=5, read_timeout=None, write_timeout=5)
+    timeout=None
+    colorama.init(autoreset=True)
     lock = threading.Lock()
     vaksms = vakverification()
     bypasscap = bypasscaptcha()
@@ -22,7 +26,6 @@ def verify(totalthreads, threadindex, proxytype):
 
     if str(PHONESERVICE).lower() != "vaksms":
         pystyle.Write.Print(f"\t[-] Only https://vak-sms.com is supported at the moment!\n", pystyle.Colors.red, interval=0), time.sleep(2), sys.exit(0)
-
 
     def gettoken():
         with open("files/tokens.txt", "r+") as tokenfile:
@@ -69,9 +72,9 @@ def verify(totalthreads, threadindex, proxytype):
     }
     
     def checktoken():
-        try: response = httpx.get("https://discord.com/api/v9/users/@me", headers=HEADERS, proxies=proxyauth if proxytype != "" else None)
-        except httpx.ProxyError: response = httpx.get("https://discord.com/api/v9/users/@me", headers=HEADERS, proxies=None)
-    
+        with httpx.Client(headers=HEADERS, timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
+            response = client.get("https://discord.com/api/v9/users/@me")
+
         try:
             if response.json()["message"] == "401: Unauthorized":
                 with open("files/invalidtoken.txt", "a+") as invalidfile: invalidfile.write(TOKENCOMBO)
@@ -83,7 +86,8 @@ def verify(totalthreads, threadindex, proxytype):
             if "id" in response.json(): lock.acquire(), pystyle.Write.Print(f"\t[+] Valid Token {TOKEN}!\n", pystyle.Colors.green, interval=0), lock.release()
     checktoken()
 
-    if str(PHONESERVICE).lower() == "vaksms": NUMBER, TZID = vaksms.ordernumber()
+    if str(PHONESERVICE).lower() == "vaksms":
+        NUMBER, TZID = vaksms.ordernumber()
 
     def verifiedtoken():
         with open("files/verifiedtoken.txt", "a+") as verifiedfile: verifiedfile.write(TOKENCOMBO)
@@ -92,7 +96,7 @@ def verify(totalthreads, threadindex, proxytype):
             for line in lines:
                 if line.strip("\n") != TOKENCOMBO:
                     tokenfile.write(line)
-        lock.acquire(), pystyle.Write.Print(f"\t[+] Successfully verified {TOKEN} with {NUMBER}!\n", pystyle.Colors.green, interval=0), lock.release()
+        lock.acquire(), pystyle.Write.Print(f"\t[+] Successfully verified {TOKEN} with {NUMBER}!\n", pystyle.Colors.green, interval=0), print(), lock.release()
         removetoken()
         verify(totalthreads, threadindex, proxytype)
 
@@ -103,8 +107,8 @@ def verify(totalthreads, threadindex, proxytype):
     CAPTCHATOKEN = bypasscap.hcaptcha()
 
     data1 = {"captcha_key": CAPTCHATOKEN, "change_phone_reason": "user_settings_update", "phone": NUMBER}
-    try: resp2 = httpx.post("https://discord.com/api/v9/users/@me/phone", json=data1, headers=HEADERS, proxies=proxyauth if proxytype != "" else None)
-    except httpx.ProxyError: resp2 = httpx.post("https://discord.com/api/v9/users/@me/phone", json=data1, headers=HEADERS, proxies=None)
+    with httpx.Client(headers=HEADERS, timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
+        resp2 = client.post("https://discord.com/api/v9/users/@me/phone", json=data1)
     lock.acquire()
     if resp2.status_code == 204: pystyle.Write.Print("\t[+] Successfully requested verification code!\n", pystyle.Colors.green, interval=0)
     lock.release()
@@ -113,21 +117,23 @@ def verify(totalthreads, threadindex, proxytype):
         waitcount = 0
         if str(PHONESERVICE).lower() == "vaksms": smsurl = f"https://vak-sms.com/api/getSmsCode/?apiKey={VAKAPIKEY}&idNum={TZID}"
         discordurl = "https://discord.com/api/v9/users/@me/phone"
+        with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
+            discordresponse = client.get(discordurl, headers=HEADERS).json()
+            smsresponse = client.get(smsurl, headers=None).json()
         
-        smsresponse = httpx.get(smsurl, headers=None).json()
-        discordresponse = httpx.get(discordurl, headers=HEADERS, proxies=proxyauth if proxytype != "" else None).json()
         while smsresponse["smsCode"] is None: 
             waitcount = waitcount + 1
-            lock.acquire(), pystyle.Write.Print(f"\t[*] Discord havn't sent the SMS so far... {waitcount}/60!\n", pystyle.Colors.yellow, interval=0), lock.release()
-            smsresponse = httpx.get(smsurl, headers=None).json()
-            time.sleep(.5)
+            pystyle.Write.Print(f"\t[*] Discord havn't sent the SMS so far... {waitcount}/120!\n", pystyle.Colors.yellow, interval=0)
+            with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
+                smsresponse = client.get(smsurl, headers=None).json()
+                time.sleep(.3)
             
             if waitcount % 5 == 0: # run every x time to request a new sms from discord
                 data = {"phone": NUMBER, "change_phone_reason": "user_settings_update"}
-                discordurl = "https://discord.com/api/v9/users/@me/phone"
-                discordresponse = httpx.post(discordurl, json=data, headers=HEADERS, proxies=proxyauth if proxytype != "" else None)
+                with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
+                    discordresponse = client.post(discordurl, json=data, headers=HEADERS)
             
-            if waitcount >= 60:
+            if waitcount >= 120:
                 lock.acquire()
                 pystyle.Write.Print(f"\t[-] Discord did not sent a SMS to {NUMBER} in time! Check the Token & Proxy Quality\n", pystyle.Colors.red, interval=0)
                 with open("files/failedverify.txt", "a+") as failedfile: failedfile.write(TOKENCOMBO)
@@ -138,18 +144,18 @@ def verify(totalthreads, threadindex, proxytype):
         verifycode = smsresponse["smsCode"]
         return verifycode
     VERIFYCODE = waitsms()
-
+    
     if VERIFYCODE is not None:
         lock.acquire(), pystyle.Write.Print(f"\t[*] Found Verificationcode: {VERIFYCODE}, sending it to Discord...\n", pystyle.Colors.yellow, interval=0), lock.release()
         data2 = {"phone": NUMBER, "code": VERIFYCODE}
+        with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
+            url = "https://discord.com/api/v9/phone-verifications/verify"
+            resp4 = client.post(url, json=data2, headers=HEADERS).json()
+            try: phone_token = resp4["token"]
+            except KeyError: phone_token = None
         
-        try: resp4 = httpx.post("https://discord.com/api/v9/phone-verifications/verify", json=data2, headers=HEADERS, proxies=proxyauth if proxytype != "" else None)
-        except httpx.ProxyError: resp4 = httpx.post("https://discord.com/api/v9/phone-verifications/verify", json=data2, headers=HEADERS, proxies=None)
-        try: phone_token = resp4.json()["token"]
-        except KeyError: phone_token = None
-        
-        data3 = {"change_phone_reason": "user_settings_update", "password": PASSWORD, "phone_token": phone_token}
-        httpx.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=HEADERS)
+            data3 = {"change_phone_reason": "user_settings_update", "password": PASSWORD, "phone_token": phone_token}
+            client.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=HEADERS)
         verifiedtoken()
     
     elif VERIFYCODE is None:
