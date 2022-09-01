@@ -36,6 +36,7 @@ Take a look in config.json. Here the File's content with a explaination what eac
 
     "PHONE STUFF": {
         "SERVICE": "VAKSMS", # Select the Service you want to use. The best & cheapest configurations are set by default.
+	"RETRIES": 3, # Rotate current Number after x amount of retries set here with the same token (helpful if discord don't send the sms because of a flagged phonenumber)
 		
         "VAKSMS": {
             "API KEY" : "", # Same goes for the Phone Services, the APIkey is used to login into the account, order numbers, get sms, delete numbers etc.
