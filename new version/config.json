@@ -8,6 +8,7 @@
 
     "PHONE STUFF": {
         "SERVICE": "VAKSMS",
+	"RETRIES": 3,
 		
         "VAKSMS": {
             "API KEY" : "",
