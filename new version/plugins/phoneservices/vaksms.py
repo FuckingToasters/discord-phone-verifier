@@ -6,7 +6,7 @@ from plugins.configuration.load import config
 
 class vakverification:
     def __init__(self):
-        _, _, _, _, _, self.APIKEY, self.COUNTRY, _, _ = config().loadconfig()
+        _, _, _, _, _, self.APIKEY, self.COUNTRY, _, _, _ = config().loadconfig()
         self.BALANCE = None
         self.STOCK = None
         self.PRICE = None
