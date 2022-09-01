@@ -21,7 +21,7 @@ def verify(totalthreads, threadindex, proxytype):
     vaksms = vakverification()
     bypasscap = bypasscaptcha()
     proxyauth = loadproxyclass().loadproxy(proxytype=proxytype)
-    _, _, _, PHONESERVICE, VAKAPIKEY, _, _, _ = config().loadconfig()
+    _, _, _, PHONESERVICE, TOTALRETRIES, VAKAPIKEY, _, _, _ = config().loadconfig()
     USERAGENT = randomagentclass().randomagent()
 
     if str(PHONESERVICE).lower() != "vaksms":
@@ -86,8 +86,8 @@ def verify(totalthreads, threadindex, proxytype):
             if "id" in response.json(): lock.acquire(), pystyle.Write.Print(f"\t[+] Valid Token {TOKEN}!\n", pystyle.Colors.green, interval=0), lock.release()
     checktoken()
 
-    if str(PHONESERVICE).lower() == "vaksms":
-        NUMBER, TZID = vaksms.ordernumber()
+    if str(PHONESERVICE).lower() == "vaksms": NUMBER, TZID= vaksms.ordernumber()
+
 
     def verifiedtoken():
         with open("files/verifiedtoken.txt", "a+") as verifiedfile: verifiedfile.write(TOKENCOMBO)
@@ -115,6 +115,7 @@ def verify(totalthreads, threadindex, proxytype):
 
     def waitsms():
         waitcount = 0
+        retries = 0
         if str(PHONESERVICE).lower() == "vaksms": smsurl = f"https://vak-sms.com/api/getSmsCode/?apiKey={VAKAPIKEY}&idNum={TZID}"
         discordurl = "https://discord.com/api/v9/users/@me/phone"
         with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
@@ -122,8 +123,9 @@ def verify(totalthreads, threadindex, proxytype):
             smsresponse = client.get(smsurl, headers=None).json()
         
         while smsresponse["smsCode"] is None: 
-            waitcount = waitcount + 1
-            pystyle.Write.Print(f"\t[*] Discord havn't sent the SMS so far... {waitcount}/120!\n", pystyle.Colors.yellow, interval=0)
+            waitcount, retries = waitcount + 1, retries + 1
+
+            pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/120!\n", pystyle.Colors.yellow, interval=0)
             with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
                 smsresponse = client.get(smsurl, headers=None).json()
                 time.sleep(.3)
@@ -134,12 +136,14 @@ def verify(totalthreads, threadindex, proxytype):
                     discordresponse = client.post(discordurl, json=data, headers=HEADERS)
             
             if waitcount >= 120:
-                lock.acquire()
-                pystyle.Write.Print(f"\t[-] Discord did not sent a SMS to {NUMBER} in time! Check the Token & Proxy Quality\n", pystyle.Colors.red, interval=0)
-                with open("files/failedverify.txt", "a+") as failedfile: failedfile.write(TOKENCOMBO)
-                removetoken()
-                if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
+                pystyle.Write.Print(f"\t[-] Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...\n", pystyle.Colors.red, interval=0)
                 verify(totalthreads, threadindex, proxytype)
+
+                if retries >= TOTALRETRIES:
+                    pystyle.Write.Print(f"\t[-] Failed to get SMS code after {TOTALRETRIES} retries, switching token!\n", pystyle.Colors.red, interval=0)
+                    removetoken()
+                    if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
+                    verify(totalthreads, threadindex, proxytype)
 
         verifycode = smsresponse["smsCode"]
         return verifycode
