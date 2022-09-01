@@ -5,6 +5,8 @@ import sys
 import pystyle
 import threading
 import colorama
+from discord_webhook import DiscordWebhook, DiscordEmbed
+from datetime import date
 from plugins.design import mainmenu
 from plugins.filesupport.proxy import loadproxyclass
 from plugins.filesupport.useragent import randomagentclass
@@ -21,7 +23,7 @@ def verify(totalthreads, threadindex, proxytype):
     vaksms = vakverification()
     bypasscap = bypasscaptcha()
     proxyauth = loadproxyclass().loadproxy(proxytype=proxytype)
-    _, _, _, PHONESERVICE, TOTALRETRIES, VAKAPIKEY, _, _, _ = config().loadconfig()
+    _, _, _, PHONESERVICE, TOTALRETRIES, VAKAPIKEY, _, _, _, WEBHOOKURL = config().loadconfig()
     USERAGENT = randomagentclass().randomagent()
 
     if str(PHONESERVICE).lower() != "vaksms":
@@ -98,6 +100,26 @@ def verify(totalthreads, threadindex, proxytype):
                     tokenfile.write(line)
         lock.acquire(), pystyle.Write.Print(f"\t[+] Successfully verified {TOKEN} with {NUMBER}!\n", pystyle.Colors.green, interval=0), print(), lock.release()
         removetoken()
+
+        if WEBHOOKURL != "":
+            webhook = DiscordWebhook(url=WEBHOOKURL, rate_limit_retry=True)
+            iconurl = "https://cdn.discordapp.com/avatars/902582070335914064/a_87212f988d5e23f8edb2de2a8162744e.gif?size=1024"
+            embed = DiscordEmbed(
+                title='New Verified Token!',
+                color='03b2f8'
+                )
+            
+            embed.add_embed_field(name='Token', value=f"`{TOKEN}`", inline=False)
+            embed.add_embed_field(name='Number', value=f"`{NUMBER}`", inline=False)
+            embed.add_embed_field(name='SMS Code', value=f"`{VERIFYCODE}`", inline=False)
+            embed.set_author(name='Infinimonster#1312', icon_url=iconurl)
+            embed.set_footer(text='Discord Token Verifier', icon_url=iconurl)
+            embed.set_timestamp()
+            webhook.add_embed(embed)
+
+            webhookresponse = webhook.execute()
+            print(webhookresponse)
+
         verify(totalthreads, threadindex, proxytype)
 
     lock.acquire()
@@ -125,7 +147,7 @@ def verify(totalthreads, threadindex, proxytype):
         while smsresponse["smsCode"] is None: 
             waitcount, retries = waitcount + 1, retries + 1
 
-            pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/120!\n", pystyle.Colors.yellow, interval=0)
+            pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/25!\n", pystyle.Colors.yellow, interval=0)
             with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
                 smsresponse = client.get(smsurl, headers=None).json()
                 time.sleep(.3)
@@ -135,8 +157,9 @@ def verify(totalthreads, threadindex, proxytype):
                 with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
                     discordresponse = client.post(discordurl, json=data, headers=HEADERS)
             
-            if waitcount >= 120:
+            if waitcount >= 25:
                 pystyle.Write.Print(f"\t[-] Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...\n", pystyle.Colors.red, interval=0)
+                if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
                 verify(totalthreads, threadindex, proxytype)
 
                 if retries >= TOTALRETRIES:
