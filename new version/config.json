@@ -8,7 +8,7 @@
 
     "PHONE STUFF": {
         "SERVICE": "VAKSMS",
-	"RETRIES": 3,
+        "RETRIES": 5,
 		
         "VAKSMS": {
             "API KEY" : "",
@@ -19,5 +19,9 @@
             "API KEY": "",
             "COUNTRY": "372"
         }
+    },
+
+    "DISCORD STUFF": {
+        "WEBHOOK URL": ""
     }
 }
