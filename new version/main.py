@@ -147,7 +147,7 @@ def verify(totalthreads, threadindex, proxytype):
         while smsresponse["smsCode"] is None: 
             waitcount, retries = waitcount + 1, retries + 1
 
-            pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/25!\n", pystyle.Colors.yellow, interval=0)
+            pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/35!\n", pystyle.Colors.yellow, interval=0)
             with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
                 smsresponse = client.get(smsurl, headers=None).json()
                 time.sleep(.3)
@@ -157,7 +157,7 @@ def verify(totalthreads, threadindex, proxytype):
                 with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
                     discordresponse = client.post(discordurl, json=data, headers=HEADERS)
             
-            if waitcount >= 25:
+            if waitcount >= 35:
                 pystyle.Write.Print(f"\t[-] Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...\n", pystyle.Colors.red, interval=0)
                 if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
                 verify(totalthreads, threadindex, proxytype)
