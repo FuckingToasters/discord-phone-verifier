@@ -61,8 +61,8 @@ Take a look in config.json. Here the File's content with a explaination what eac
 ```
 
 
-### Why the SMS don't appear
-------------------------------------
-> Check the Quality of your Tokens & your proxies
+### Why the SMS don't appear (sorted by Probability)
+----------------------------------------------------
+> Phonenumber is flagged by Discord
 
-> If the Quality is good, then change the country from the phonesrvice in config.json
+> Tokens or Proxies are Low Quality
