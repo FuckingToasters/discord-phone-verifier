@@ -66,3 +66,12 @@ Take a look in config.json. Here the File's content with a explaination what eac
 > Phonenumber is flagged by Discord
 
 > Tokens or Proxies are Low Quality
+
+### You can donate me on the crypto addresses below. 
+### With every Donation i keep being motivated to update this repo & make other opensrc tools:
+----------------------------------------------------
+Bitcoin: `bc1q35xnax3y9tc8kvk5hka9px8nf3wr7l0tc3emj4`
+Litecoin: `LW8amPqy5V7Ew5ofKZnFwPW8NzBM68R38y``
+Etherum: `0x05aa320E4CA3463583b9BCD6cE9b97229ae4C20A`
+Solana: `2ANHyTwPH2ggKsCp7BmtHvoRsNFHUk8hg6xsUFuHM3gu`
+Monero: `46DoyAMcKkEPhv2J2kNYKfcgb3ur7TEEbNiqSxHctTTU7ebMtLYvoU5ZsNaQFQ2JttDYZuccKKax13yZKzWq4TiUFHW6YLc`
