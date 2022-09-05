@@ -207,6 +207,7 @@ if __name__ == "__main__":
             t = threading.Thread(target=verify, args=(int(totalthreads), threadindex, proxyinput, ))
             t.start()
             threads.append(t)
+            time.sleep(.7)
 
     except ValueError:
         print(pystyle.Write.Input("\t[**] Enter a valid Thread Number!\n", pystyle.Colors.red, interval=0))
