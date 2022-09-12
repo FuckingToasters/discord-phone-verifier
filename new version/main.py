@@ -53,7 +53,19 @@ def verify(totalthreads, threadindex, proxytype):
                 tokenfile.seek(0), tokenfile.truncate(), tokenfile.writelines(LINES)
             else: pass
             # else: lock.acquire(), pystyle.Write.Print(f"\t[-] Every Token from files/tokens.txt got used. File need to be refilled!\n", pystyle.Colors.red, interval=0), lock.release(), sys.exit(1)
-
+        with open("files/failedverify.txt", "a+") as failedfile: failedfile.write(TOKENCOMBO)
+    
+    def removeinvalidtoken():
+        with open("files/tokens.txt", "r+") as tokenfile:
+            tokenfile.seek(0)
+            LINES = tokenfile.readlines()
+            if TOKENCOMBO in LINES:
+                LINES.remove(TOKENCOMBO)
+                tokenfile.seek(0), tokenfile.truncate(), tokenfile.writelines(LINES)
+            else: pass
+        with open("files/invalidtokens.txt", "a+") as invalidfile: invalidfile.write(TOKENCOMBO)
+            
+            
     HEADERS = {
         "accept": "*/*",
         "accept-encoding": "gzip, deflate, br",
@@ -79,8 +91,7 @@ def verify(totalthreads, threadindex, proxytype):
 
         try:
             if response.json()["message"] == "401: Unauthorized":
-                with open("files/invalidtoken.txt", "a+") as invalidfile: invalidfile.write(TOKENCOMBO)
-                removetoken()
+                removeinvalidtoken()
                 pystyle.Write.Print(f"\t[-] Invalid Token: {TOKEN}!\n", pystyle.Colors.red, interval=0)
                 verify(totalthreads, threadindex, proxytype)
         
@@ -88,7 +99,7 @@ def verify(totalthreads, threadindex, proxytype):
             if "id" in response.json(): lock.acquire(), pystyle.Write.Print(f"\t[+] Valid Token {TOKEN}!\n", pystyle.Colors.green, interval=0), lock.release()
     checktoken()
 
-    if str(PHONESERVICE).lower() == "vaksms": NUMBER, TZID= vaksms.ordernumber()
+    if str(PHONESERVICE).lower() == "vaksms": NUMBER, TZID = vaksms.ordernumber()
 
 
     def verifiedtoken():
@@ -98,8 +109,8 @@ def verify(totalthreads, threadindex, proxytype):
             for line in lines:
                 if line.strip("\n") != TOKENCOMBO:
                     tokenfile.write(line)
+            removetoken()
         lock.acquire(), pystyle.Write.Print(f"\t[+] Successfully verified {TOKEN} with {NUMBER}!\n", pystyle.Colors.green, interval=0), print(), lock.release()
-        removetoken()
 
         if WEBHOOKURL != "":
             webhook = DiscordWebhook(url=WEBHOOKURL, rate_limit_retry=True)
@@ -116,10 +127,7 @@ def verify(totalthreads, threadindex, proxytype):
             embed.set_footer(text='Discord Token Verifier', icon_url=iconurl)
             embed.set_timestamp()
             webhook.add_embed(embed)
-
-            webhookresponse = webhook.execute()
-            print(webhookresponse)
-
+            webhook.execute()
         verify(totalthreads, threadindex, proxytype)
 
     lock.acquire()
@@ -145,9 +153,9 @@ def verify(totalthreads, threadindex, proxytype):
             smsresponse = client.get(smsurl, headers=None).json()
         
         while smsresponse["smsCode"] is None: 
-            waitcount, retries = waitcount + 1, retries + 1
+            waitcount += 1
 
-            pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/35!\n", pystyle.Colors.yellow, interval=0)
+            pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/50!\n", pystyle.Colors.yellow, interval=0)
             with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
                 smsresponse = client.get(smsurl, headers=None).json()
                 time.sleep(.3)
@@ -157,23 +165,27 @@ def verify(totalthreads, threadindex, proxytype):
                 with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
                     discordresponse = client.post(discordurl, json=data, headers=HEADERS)
             
-            if waitcount >= 35:
-                pystyle.Write.Print(f"\t[-] Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...\n", pystyle.Colors.red, interval=0)
-                if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
-                verify(totalthreads, threadindex, proxytype)
-
+            if waitcount >= 50:
+                retries += 1
+                print(retries)
                 if retries >= TOTALRETRIES:
                     pystyle.Write.Print(f"\t[-] Failed to get SMS code after {TOTALRETRIES} retries, switching token!\n", pystyle.Colors.red, interval=0)
                     removetoken()
                     if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
                     verify(totalthreads, threadindex, proxytype)
+                
+                else:
+                    pystyle.Write.Print(f"\t[-] Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...\n", pystyle.Colors.red, interval=0)
+                    if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
+                    verify(totalthreads, threadindex, proxytype)
+
 
         verifycode = smsresponse["smsCode"]
         return verifycode
     VERIFYCODE = waitsms()
     
     if VERIFYCODE is not None:
-        lock.acquire(), pystyle.Write.Print(f"\t[*] Found Verificationcode: {VERIFYCODE}, sending it to Discord...\n", pystyle.Colors.yellow, interval=0), lock.release()
+        lock.acquire(), pystyle.Write.Print(f"\t[*] Found Verificationcode: {VERIFYCODE}, sending it to Discord...\n", pystyle.Colors.pink, interval=0), lock.release()
         data2 = {"phone": NUMBER, "code": VERIFYCODE}
         with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
             url = "https://discord.com/api/v9/phone-verifications/verify"
@@ -187,7 +199,6 @@ def verify(totalthreads, threadindex, proxytype):
     
     elif VERIFYCODE is None:
         lock.acquire(), pystyle.Write.Print(f"\t[-] Failed to get verification code! Rerunning...\n", pystyle.Colors.red, interval=0), lock.release()
-        with open("files/failedverify.txt", "a+") as failedfile: failedfile.write(TOKENCOMBO)
         removetoken()
         verify(totalthreads, threadindex, proxytype)
 
@@ -207,7 +218,7 @@ if __name__ == "__main__":
             t = threading.Thread(target=verify, args=(int(totalthreads), threadindex, proxyinput, ))
             t.start()
             threads.append(t)
-            time.sleep(.7)
+            time.sleep(3)
 
     except ValueError:
         print(pystyle.Write.Input("\t[**] Enter a valid Thread Number!\n", pystyle.Colors.red, interval=0))
