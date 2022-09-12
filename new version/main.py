@@ -155,7 +155,7 @@ def verify(totalthreads, threadindex, proxytype):
         while smsresponse["smsCode"] is None: 
             waitcount += 1
 
-            pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/35!\n", pystyle.Colors.yellow, interval=0)
+            pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/40!\n", pystyle.Colors.yellow, interval=0)
             with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
                 smsresponse = client.get(smsurl, headers=None).json()
                 time.sleep(.3)
@@ -165,7 +165,7 @@ def verify(totalthreads, threadindex, proxytype):
                 with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
                     discordresponse = client.post(discordurl, json=data, headers=HEADERS)
             
-            if waitcount >= 35:
+            if waitcount >= 40:
                 retries += 1
                 print(retries)
                 if retries >= TOTALRETRIES:
