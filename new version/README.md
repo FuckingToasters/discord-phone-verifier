@@ -33,7 +33,7 @@ Take a look in config.json. Here the File's content with a explaination what eac
 ```json
 {
     "CAPTCHA STUFF": {
-        "SERVICE": 2, # 1 = Capmonster, 2 = Anticaptcha, 3 = 2Captcha
+        "SERVICE": 2, # 1 = Capmonster, 2 = Anticaptcha, 3 = 2Captcha | Capmonster & 2Captcha are flagged and can get the Tokens locked or disabled
         "API KEY": "", # Only with this Key the Tool can login in your Account and perform the required actions to solve the captcha
         "SITE KEY": "f5561ba9-8f1e-40ca-9b5b-a0b3f719ef34" # Don't need to be changed and is use to identify the captcha's on discord's site. The Sitekey might change at one point but it did not change for at least a month now.
 
