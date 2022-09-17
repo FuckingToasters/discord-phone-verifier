@@ -60,12 +60,19 @@ Take a look in config.json. Here the File's content with a explaination what eac
 }
 ```
 
+### Some Infomrations
+----------------------------------------------------
+2Captcha's & Anticaptcha's way of solving the Captcha can lock the tokens or even disable them
+If you want to go sure, use anticaptcha & proxies with following configuuration: residential stickiness for  1m - 2m & random country
+
 
 ### Why the SMS don't appear (sorted by Probability)
 ----------------------------------------------------
 > Phonenumber is flagged by Discord
 
 > Tokens or Proxies are Low Quality
+
+
 
 ### You can donate me on the crypto addresses below. 
 ### With every Donation i keep being motivated to update this repo & make other opensrc tools:
