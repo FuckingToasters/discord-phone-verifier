@@ -123,7 +123,7 @@ def verify(totalthreads, threadindex, proxytype):
             embed.add_embed_field(name='Token', value=f"`{TOKEN}`", inline=False)
             embed.add_embed_field(name='Number', value=f"`{NUMBER}`", inline=False)
             embed.add_embed_field(name='SMS Code', value=f"`{VERIFYCODE}`", inline=False)
-            embed.set_author(name='Infinimonster#1312', icon_url=iconurl)
+            embed.set_author(name='Infinimonster#0001', icon_url=iconurl)
             embed.set_footer(text='Discord Token Verifier', icon_url=iconurl)
             embed.set_timestamp()
             webhook.add_embed(embed)
@@ -167,7 +167,6 @@ def verify(totalthreads, threadindex, proxytype):
             
             if waitcount >= 40:
                 retries += 1
-                print(retries)
                 if retries >= TOTALRETRIES:
                     pystyle.Write.Print(f"\t[-] Failed to get SMS code after {TOTALRETRIES} retries, switching token!\n", pystyle.Colors.red, interval=0)
                     removetoken()
