@@ -3,7 +3,7 @@ import os
 import ctypes
 
 # https://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20
-developer = "Infinimonster#1312"
+developer = "Infinimonster#0001"
 def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
