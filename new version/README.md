@@ -18,11 +18,11 @@
 
 > Higher Chance for Discord to send the SMS Code (stopped discord being lazy af)
 
-> Webooh Support for succesful verifications, making it easy to get new verified tokens without looking in the trminal or the verifiedtokens.txt file
+> Webhook Support for successful verifications, making it easy to get infomrations about new verified tokens without looking in the console or the verifiedtokens.txt file
 
-> Custom retry count in config.json in addition to the waitcount (waitcount are the ticks it'll try to get the sms which is set to 35 by defualt. retries is the number of times it'll try to verify the same token with another number until it switch to a next token.
+> Custom retry count in config.json in addition to the waitcount (waitcount are the ticks it'll try to get the sms which is set to 35 by default. retries is the number of times it'll try to verify the same token with another number until it switch to a next token.
 
-> Numbers who havn't gotten the SMS in time will be delted from site (avoding discord send sms afterwards which'll use unncececary baöance for a code you > didn't used)
+> Numbers who havn't gotten the SMS in time will be delted from site (avoding discord send sms afterwards which'll use unncececary balance for a code you didn't used)
 
 > A lot more improvments & still in development
 
