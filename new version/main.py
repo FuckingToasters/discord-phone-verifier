@@ -132,13 +132,25 @@ def verify(totalthreads, threadindex, proxytype):
 
     lock.acquire()
     pystyle.Write.Print(f"\t[+] Sucessfully got Number {NUMBER}\n", pystyle.Colors.green, interval=0)
-    pystyle.Write.Print("\t[*] Solving captcha... please be patient!\n", pystyle.Colors.yellow, interval=0)
     lock.release()
-    CAPTCHATOKEN = bypasscap.hcaptcha()
-
-    data1 = {"captcha_key": CAPTCHATOKEN, "change_phone_reason": "user_settings_update", "phone": NUMBER}
+    
+    data1 = {"captcha_key": None, "change_phone_reason": "user_settings_update", "phone": NUMBER}
     with httpx.Client(headers=HEADERS, timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
         resp2 = client.post("https://discord.com/api/v9/users/@me/phone", json=data1)
+        if "captcha_key" in resp2.json():
+            if resp2.json()["captcha_key"] == ["You need to update your app to verify your phone number."]:
+                lock.acquire()
+                pystyle.Write.Print("\t[*] Solving captcha... please be patient!\n", pystyle.Colors.yellow, interval=0)
+                lock.release()
+                CAPTCHATOKEN = bypasscap.hcaptcha()
+                data1["captcha_key"] = CAPTCHATOKEN
+                resp2 = client.post("https://discord.com/api/v9/users/@me/phone", json=data1)
+        
+        else:
+            lock.acquire()
+            pystyle.Write.Print("\t[*] No Captcha Solving required... Skipping!\n", pystyle.Colors.yellow, interval=0)
+            lock.release()
+            
     lock.acquire()
     if resp2.status_code == 204: pystyle.Write.Print("\t[+] Successfully requested verification code!\n", pystyle.Colors.green, interval=0)
     lock.release()
@@ -191,9 +203,6 @@ def verify(totalthreads, threadindex, proxytype):
             resp4 = client.post(url, json=data2, headers=HEADERS).json()
             try: phone_token = resp4["token"]
             except KeyError: phone_token = None
-        
-            data3 = {"change_phone_reason": "user_settings_update", "password": PASSWORD, "phone_token": phone_token}
-            client.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=HEADERS)
         verifiedtoken()
     
     elif VERIFYCODE is None:
