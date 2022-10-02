@@ -16,6 +16,7 @@ from plugins.configuration.load import config
 
 def print_main_menu(): return mainmenu.logo()
 def verify(totalthreads, threadindex, proxytype):
+    captcha_required = False
     # timeout = httpx.TimeoutConfig(connect_timeout=5, read_timeout=None, write_timeout=5)
     timeout=None
     colorama.init(autoreset=True)
@@ -123,6 +124,7 @@ def verify(totalthreads, threadindex, proxytype):
             embed.add_embed_field(name='Token', value=f"`{TOKEN}`", inline=False)
             embed.add_embed_field(name='Number', value=f"`{NUMBER}`", inline=False)
             embed.add_embed_field(name='SMS Code', value=f"`{VERIFYCODE}`", inline=False)
+            embed.add_embed_field(name='Captcha Required', value=f"`{captcha_required}`", inline=False)
             embed.set_author(name='Infinimonster#0001', icon_url=iconurl)
             embed.set_footer(text='Discord Token Verifier', icon_url=iconurl)
             embed.set_timestamp()
@@ -145,6 +147,7 @@ def verify(totalthreads, threadindex, proxytype):
                 CAPTCHATOKEN = bypasscap.hcaptcha()
                 data1["captcha_key"] = CAPTCHATOKEN
                 resp2 = client.post("https://discord.com/api/v9/users/@me/phone", json=data1)
+                captcha_required = True
         
         else:
             lock.acquire()
