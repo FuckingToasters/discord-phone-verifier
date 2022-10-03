@@ -206,6 +206,9 @@ def verify(totalthreads, threadindex, proxytype):
             resp4 = client.post(url, json=data2, headers=HEADERS).json()
             try: phone_token = resp4["token"]
             except KeyError: phone_token = None
+            
+            data3 = {"change_phone_reason": "user_settings_update", "password": PASSWORD.rstrip(), "phone_token": phone_token}
+            client.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=HEADERS)
         verifiedtoken()
     
     elif VERIFYCODE is None:
