@@ -18,7 +18,7 @@ def print_main_menu(): return mainmenu.logo()
 def verify(totalthreads, threadindex, proxytype):
     captcha_required = False
     # timeout = httpx.TimeoutConfig(connect_timeout=5, read_timeout=None, write_timeout=5)
-    timeout=None
+    timeout = httpx.Timeout(20.0, read=None)
     colorama.init(autoreset=True)
     lock = threading.Lock()
     vaksms = vakverification()
