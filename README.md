@@ -11,4 +11,4 @@ Onlinesim will be added to the new one later so you benefit from the new feature
 PLEASE NOTE
 ------------------------------------
 You can use the Tool, modify and it and use it for private purposes. You are not Allowed to sell the orginal src or a modified version.
-I may press legal actions when violating these rules, otherwise feel free to use my tools for anything you want.
+(If u are poor, you should buy EV from someone and make thwm Fully Verified using the tool, then sell the FV ones but don't sell this tool pls)
