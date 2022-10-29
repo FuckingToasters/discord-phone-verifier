@@ -2,5 +2,5 @@ httpx
 httpx[socks]
 captchatools
 invisifox
-pystyle
+pystyle==2.0
 brotlipy
