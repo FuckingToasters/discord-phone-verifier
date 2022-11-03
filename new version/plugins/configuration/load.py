@@ -13,10 +13,19 @@ class config:
         self.RETRIES = config["PHONE STUFF"]["RETRIES"]
         self.VAKAPIKEY = config["PHONE STUFF"]["VAKSMS"]["API KEY"]
         self.VAKCOUNTRY = config["PHONE STUFF"]["VAKSMS"]["COUNTRY"]
-        self.ONLINESIMAPIKEY = config["PHONE STUFF"]["ONLINESIM"]["API KEY"]
-        self.ONLINESIMCOUNTRY = config["PHONE STUFF"]["ONLINESIM"]["COUNTRY"]
+        self.FIVESIMAPIKEY = config["PHONE STUFF"]["FIVESIM"]["API KEY"]
+        self.FIVESIMCOUNTRY = config["PHONE STUFF"]["FIVESIM"]["COUNTRY"]
 
         # DISCORD STUFF
         self.WEBHOOKURL = config["DISCORD STUFF"]["WEBHOOK URL"]
 
-        return self.CAPTCHASERVICE, self.CAPTCHAPIKEY, self.CAPTCHASITEKEY, self.PHONESERVICE, self.RETRIES, self.VAKAPIKEY, self.VAKCOUNTRY, self.ONLINESIMAPIKEY, self.ONLINESIMCOUNTRY, self.WEBHOOKURL
+        return self.CAPTCHASERVICE, \
+            self.CAPTCHAPIKEY, \
+            self.CAPTCHASITEKEY, \
+            self.PHONESERVICE, \
+            self.RETRIES, \
+            self.VAKAPIKEY, \
+            self.VAKCOUNTRY, \
+            self.FIVESIMAPIKEY, \
+            self.FIVESIMCOUNTRY, \
+            self.WEBHOOKURL
