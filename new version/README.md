@@ -44,13 +44,13 @@ Take a look in config.json. Here the File's content with a explaination what eac
         "RETRIES": 5, # Rotate current Number after x amount of retries set here with the same token (helpful if discord don't send the sms because of a flagged phonenumber)
 		
         "VAKSMS": {
-            "API KEY" : "", # Same goes for the Phone Services, the APIkey is used to login into the account, order numbers, get sms, delete numbers etc.
+            "API KEY" : "", # The APIkey is used to login into the account, order numbers, get sms, delete numbers etc.
             "COUNTRY" : "phillipines" # For vaksms phillipines is the cheapest country you can choose. a phillipines cost 1 rub which is equal to $0.017
         },
     
-        "ONLINESIM": {
-            "API KEY": "", # Same goes for the Phone Services, the APIkey is used to login into the account, order numbers, get sms, delete numbers etc.
-            "COUNTRY": "372" # 372 is the countrycode for estonia. on Onlinesim a Estonia number cost $0.05
+        "FIVESIM": {
+            "API KEY": "", # The APIkey is used to login into the account, order numbers, get sms, delete numbers etc.
+            "COUNTRY": "russia" # For 5sim idk what the cheapest country is, i used russia for debugging which cost 4 rub at the moment.
         }
     },
 
