@@ -4,7 +4,10 @@ import time
 import sys
 import pystyle
 import threading
-import colorama
+import os
+import re
+
+from base64 import b64encode
 from discord_webhook import DiscordWebhook, DiscordEmbed
 from datetime import date
 from plugins.design import mainmenu
@@ -12,23 +15,25 @@ from plugins.filesupport.proxy import loadproxyclass
 from plugins.filesupport.useragent import randomagentclass
 from plugins.captcha.hcaptchasolver import bypasscaptcha
 from plugins.phoneservices.vaksms import vakverification
+from plugins.phoneservices.fivesim import fivesimverification
 from plugins.configuration.load import config
 
 def print_main_menu(): return mainmenu.logo()
 def verify(totalthreads, threadindex, proxytype):
     captcha_required = False
     # timeout = httpx.TimeoutConfig(connect_timeout=5, read_timeout=None, write_timeout=5)
-    colorama.init(autoreset=True)
     lock = threading.Lock()
     vaksms = vakverification()
+    fivesim = fivesimverification()
     bypasscap = bypasscaptcha()
     proxyauth = loadproxyclass().loadproxy(proxytype=proxytype)
     _, _, _, PHONESERVICE, TOTALRETRIES, VAKAPIKEY, _, _, _, WEBHOOKURL = config().loadconfig()
     USERAGENT = randomagentclass().randomagent()
 
+    """
     if str(PHONESERVICE).lower() != "vaksms":
         pystyle.Write.Print(f"\t[-] Only https://vak-sms.com is supported at the moment!\n", pystyle.Colors.red, interval=0), time.sleep(2), sys.exit(0)
-
+    """
     def gettoken():
         with open("files/tokens.txt", "r+") as tokenfile:
             tokenfile.seek(0)
@@ -65,7 +70,31 @@ def verify(totalthreads, threadindex, proxytype):
             else: pass
         with open("files/invalidtokens.txt", "a+") as invalidfile: invalidfile.write(TOKENCOMBO)
             
-            
+
+    def generate_properties():
+        discord = httpx.get("https://discord.com/app")
+        file_with_build_num = 'https://discord.com/assets/'+re.compile(r'assets/+([a-z0-9]+)\.js').findall(discord.text)[-2]+'.js'
+        bn = re.compile('\(t="[0-9]+"\)').findall(httpx.get(file_with_build_num).text)[0].replace("(t=\"", "").replace('")', "")
+        payload = {
+            "os": "Windows" if os.name == "nt" else "Linux",
+            "browser": "Chrome",
+            "device": "",
+            "system_locale": "en-US",
+            "browser_user_agent": USERAGENT,
+            "browser_version": "100.0.4896.60",
+            "os_version": "10",
+            "referrer": "",
+            "referring_domain": "",
+            "referrer_current": "",
+            "referring_domain_current": "",
+            "release_channel": "stable",
+            "client_build_number": int(bn),
+            "client_event_source": None
+            }
+        properties = b64encode(json.dumps(payload).encode()).decode()
+        return properties
+        
+
     HEADERS = {
         "accept": "*/*",
         "accept-encoding": "gzip, deflate, br",
@@ -82,7 +111,7 @@ def verify(totalthreads, threadindex, proxytype):
         "sec-fetch-site": "same-origin",
         "user-agent": USERAGENT,
         "x-debug-options": "bugReporterEnabled",
-        "x-super-properties": "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwMC4wLjQ4OTYuNjAgU2FmYXJpLzUzNy4zNiIsImJyb3dzZXJfdmVyc2lvbiI6IjEwMC4wLjQ4OTYuNjAiLCJvc192ZXJzaW9uIjoiMTAiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTMyNjQ3LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ=="
+        "x-super-properties": generate_properties()
     }
     
     def checktoken():
@@ -100,6 +129,7 @@ def verify(totalthreads, threadindex, proxytype):
     checktoken()
 
     if str(PHONESERVICE).lower() == "vaksms": NUMBER, TZID = vaksms.ordernumber()
+    elif str(PHONESERVICE).lower() == "fivesim": NUMBER, TZID = fivesim.ordernumber()
 
 
     def verifiedtoken():
@@ -160,40 +190,33 @@ def verify(totalthreads, threadindex, proxytype):
     def waitsms():
         waitcount = 0
         retries = 0
-        if str(PHONESERVICE).lower() == "vaksms": smsurl = f"https://vak-sms.com/api/getSmsCode/?apiKey={VAKAPIKEY}&idNum={TZID}"
-        discordurl = "https://discord.com/api/v9/users/@me/phone"
-        with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
-            discordresponse = client.get(discordurl, headers=HEADERS).json()
-            smsresponse = client.get(smsurl, headers=None).json()
-        
-        while smsresponse["smsCode"] is None: 
-            waitcount += 1
+        if str(PHONESERVICE).lower() == "vaksms": waitcount, verifycode = vaksms.getcode()
+        elif str(PHONESERVICE).lower() == "fivesim": waitcount, verifycode = fivesim.getcode()
 
-            pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/40!\n", pystyle.Colors.yellow, interval=0)
-            with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
-                smsresponse = client.get(smsurl, headers=None).json()
-                time.sleep(.3)
-            
+        discordurl = "https://discord.com/api/v9/users/@me/phone"
+        discordresponse = None
+        if waitcount is int:
             if waitcount % 5 == 0: # run every x time to request a new sms from discord
                 data = {"phone": NUMBER, "change_phone_reason": "user_settings_update"}
                 with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
-                    discordresponse = client.post(discordurl, json=data, headers=HEADERS)
+                    discordresponse = client.post(discordurl, json=data, headers=HEADERS) # discord response
+        
+        
+        if waitcount == "TIMEOUT":
+            retries += 1
+            if retries >= TOTALRETRIES:
+                pystyle.Write.Print(f"\t[-] Failed to get SMS code after {TOTALRETRIES} retries, switching token!\n", pystyle.Colors.red, interval=0)
+                removetoken()
+                if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
+                elif str(PHONESERVICE).lower() == "fivesim": fivesim.deletenumber()
+                verify(totalthreads, threadindex, proxytype)
             
-            if waitcount >= 40:
-                retries += 1
-                if retries >= TOTALRETRIES:
-                    pystyle.Write.Print(f"\t[-] Failed to get SMS code after {TOTALRETRIES} retries, switching token!\n", pystyle.Colors.red, interval=0)
-                    removetoken()
-                    if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
-                    verify(totalthreads, threadindex, proxytype)
-                
-                else:
-                    pystyle.Write.Print(f"\t[-] Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...\n", pystyle.Colors.red, interval=0)
-                    if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
-                    verify(totalthreads, threadindex, proxytype)
+            else:
+                pystyle.Write.Print(f"\t[-] Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...\n", pystyle.Colors.red, interval=0)
+                if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
+                elif str(PHONESERVICE).lower() == "fivesim": fivesim.deletenumber()
+                verify(totalthreads, threadindex, proxytype)
 
-
-        verifycode = smsresponse["smsCode"]
         return verifycode
     VERIFYCODE = waitsms()
     
