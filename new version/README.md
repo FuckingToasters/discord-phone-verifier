@@ -10,7 +10,7 @@
 > If running verify function in same Thread again, sam Token will be used
 
 #### Version2:
-> Support vaksms only.
+> Support vaksms & 5sim only.
 
 > Code is split in different files, making it easy to reproduce for People's who are intrested in the Code
 
