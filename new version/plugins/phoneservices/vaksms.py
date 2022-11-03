@@ -1,7 +1,7 @@
 import httpx as requests
 import pystyle
 import threading
-import sys
+import time
 from plugins.configuration.load import config
 
 class vakverification:
@@ -15,6 +15,7 @@ class vakverification:
         self.VERIFYCODE = None
         self.BANNED = False
         self.DELETED = False
+        self.TIMEOUT = requests.Timeout(20.0, read=None)
 
         def country(self):
             lock = threading.Lock()
@@ -42,32 +43,14 @@ class vakverification:
                 "United Kingdom": "gb",
                 "Vietnam": "vn"
             }
+
             if self.COUNTRY.title() in cl: self.COUNTRY = cl[self.COUNTRY.title()]
             else: lock.acquire(), pystyle.Write.Print(f"\tCountry: {self.COUNTRY} is not supported.!\n", pystyle.Colors.red, interval=0), lock.release()
             return self.COUNTRY
         self.COUNTRY = country(self)
 
-
-    def getbalance(self):
-        lock = threading.Lock()
-        url = f"https://vak-sms.com/api/getBalance/?apiKey={self.APIKEY}"
-        with requests.Client(headers=None) as client: response = client.get(url).json()
-
-        if "error" in response:
-            if response["error"] == "apiKeyNotFound": lock.acquire(), pystyle.Write.Print(f"\t[-] Invalid API Key!\n", pystyle.Colors.red, interval=0), lock.release()
-        else: self.BALANCE = response['balance']
-        return self.BALANCE
-
-
-    def getnumberandpricecount(self):
-        url = f"https://vak-sms.com/api/getCountNumber/?apiKey={self.APIKEY}&service=dc&country={self.COUNTRY}&price"
-        with requests.Client(headers=None) as client: response = client.get(url).json()
-        self.STOCK, self.PRICE = response['dc'], response['price']
-        return self.STOCK, self.PRICE
-
-
     def ordernumber(self):
-        url = f"https://vak-sms.com/api/getNumber/?apiKey={self.APIKEY}&service=dc&country={self.COUNTRY}"
+        url = f"https://vak-sms.com/api/getNumber/?apiKey={self.APIKEY}&service=dc&country={self.COUNTRY}&softId=34"
         with requests.Client(headers=None) as client: response = client.get(url).json()
         self.NUMBER, self.TZID = str(response["tel"]), response["idNum"]
         self.NUMBER = f"+{self.NUMBER}"
@@ -81,3 +64,26 @@ class vakverification:
         # with requests.Client(headers=None) as client: response = client.get(url).json()
         # if response["status"] == "update":  self.DELETED = True
         # return self.DELETED
+    
+    def getcode(self):
+        waitcount = 0
+        url = f"https://vak-sms.com/api/getStatus/?apiKey={self.APIKEY}&idNum={self.TZID}"
+        discordurl = "https://discord.com/api/v9/users/@me/phone"
+
+        with requests.Client(headers=self.HEADERS) as client: response = client.get(url).json()
+
+        # {'id': 376167805, 'phone': '+79217195992', 'operator': 'megafon', 'product': 'discord', 'price': 4, 'status': 'PENDING', 'expires': '2022-11-03T11:07:07.153905Z', 'sms': [], 'created_at': '2022-11-03T10:52:07.153905Z', 'country': 'russia'}
+        while response["smsCode"] is None: 
+            waitcount += 1
+
+            pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/120!\n", pystyle.Colors.yellow, interval=0)
+            with requests.Client(timeout=self.TIMEOUT) as client:
+                response = client.get(url, headers=self.HEADERS).json()
+                time.sleep(.3)
+            
+            if waitcount >= 120:
+                return "TIMEOUT", False
+        
+        print(response)
+        self.VERIFYCODE = response["sms"][0]["code"] if response["status"] == "FINISHED" else None
+        return waitcount, self.VERIFYCODE
