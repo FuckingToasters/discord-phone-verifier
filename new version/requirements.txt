@@ -1,6 +1,5 @@
 httpx
 httpx[socks]
 captchatools
-invisifox
 pystyle==2.0
 brotlipy
