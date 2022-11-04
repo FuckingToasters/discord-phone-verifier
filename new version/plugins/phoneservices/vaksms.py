@@ -85,5 +85,5 @@ class vakverification:
                 return "TIMEOUT", False
         
         print(response)
-        self.VERIFYCODE = response["sms"][0]["code"] if response["status"] == "FINISHED" else None
+        self.VERIFYCODE = response["smsCode"]
         return waitcount, self.VERIFYCODE
