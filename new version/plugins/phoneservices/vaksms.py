@@ -78,7 +78,7 @@ class vakverification:
 
             pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/120!\n", pystyle.Colors.yellow, interval=0)
             with requests.Client(timeout=self.TIMEOUT) as client:
-                response = client.get(url, headers=self.HEADERS).json()
+                response = client.get(url).json()
                 time.sleep(.3)
             
             if waitcount >= 120:
