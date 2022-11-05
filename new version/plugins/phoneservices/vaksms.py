@@ -70,7 +70,7 @@ class vakverification:
         url = f"https://vak-sms.com/api/getStatus/?apiKey={self.APIKEY}&idNum={self.TZID}"
         discordurl = "https://discord.com/api/v9/users/@me/phone"
 
-        with requests.Client(headers=self.HEADERS) as client: response = client.get(url).json()
+        with requests.Client() as client: response = client.get(url).json()
 
         # {'id': 376167805, 'phone': '+79217195992', 'operator': 'megafon', 'product': 'discord', 'price': 4, 'status': 'PENDING', 'expires': '2022-11-03T11:07:07.153905Z', 'sms': [], 'created_at': '2022-11-03T10:52:07.153905Z', 'country': 'russia'}
         while response["smsCode"] is None: 
