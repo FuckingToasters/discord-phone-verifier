@@ -8,7 +8,7 @@ def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
 
 def logo():
-    if os.name == "nt": ctypes.windll.kernel32.SetConsoleTitleW(f'[Mass Tools] | Ready for use <3')
+    if os.name == "nt": ctypes.windll.kernel32.SetConsoleTitleW(f'[Discord Phone Verification] | Free OpenSource Software!')
     font = f"""
     \t██╗   ██╗███████╗██████╗ ██╗███████╗██╗ ██████╗ █████╗ ████████╗ ██████╗ ██████╗ 
     \t██║   ██║██╔════╝██╔══██╗██║██╔════╝██║██╔════╝██╔══██╗╚══██╔══╝██╔═══██╗██╔══██╗
@@ -18,7 +18,7 @@ def logo():
     \t  ╚═══╝  ╚══════╝╚═╝  ╚═╝╚═╝╚═╝     ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
     \t                                                                            
     \t━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    \tcreated by {developer}\n
+    \tcreated by {developer} | https://github.com/FuckingToasters/discord-phone-verifier\n
     """
     clear_terminal()
     pystyle.Write.Print(font, pystyle.Colors.cyan, interval=0)
