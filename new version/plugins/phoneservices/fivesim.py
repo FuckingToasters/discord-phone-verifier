@@ -41,7 +41,7 @@ class fivesimverification:
         with requests.Client(headers=self.HEADERS) as client: response = client.get(url).json()
 
         # {'id': 376167805, 'phone': '+79217195992', 'operator': 'megafon', 'product': 'discord', 'price': 4, 'status': 'PENDING', 'expires': '2022-11-03T11:07:07.153905Z', 'sms': [], 'created_at': '2022-11-03T10:52:07.153905Z', 'country': 'russia'}
-        while response["status"] == "PENDING" or response["status"] == "RECEIVED": 
+        while response["sms"] == []: 
             waitcount += 1
 
             pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/120!\n", pystyle.Colors.yellow, interval=0)
@@ -52,7 +52,6 @@ class fivesimverification:
             if waitcount >= 120:
                 return "TIMEOUT", False
         
-        print(response)
-        self.VERIFYCODE = response["sms"][0]["code"] if response["status"] == "FINISHED" else None
+        self.VERIFYCODE = response["sms"][0]["code"]
         return waitcount, self.VERIFYCODE
     
