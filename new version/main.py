@@ -28,7 +28,7 @@ def verify(totalthreads, threadindex, proxytype):
     fivesim = fivesimverification()
     smshub = smshubverification()
     bypasscap = bypasscaptcha()
-    proxyauth = loadproxyclass().loadproxy(proxytype=proxytype)
+    proxyauth = loadproxyclass().loadproxy(proxytype=proxytype)[0]
     _, _, _, PHONESERVICE, TOTALRETRIES, _, _, _, _, _, _, _, WEBHOOKURL = config().loadconfig()
     USERAGENT = randomagentclass().randomagent()
 
