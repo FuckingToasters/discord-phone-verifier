@@ -226,11 +226,13 @@ def verify(totalthreads, threadindex, proxytype):
         with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
             url = "https://discord.com/api/v9/phone-verifications/verify"
             resp4 = client.post(url, json=data2, headers=HEADERS).json()
+            print("[DEBUGGING 1] ", resp4)
             try: phone_token = resp4["token"]
             except KeyError: phone_token = None
             
             data3 = {"change_phone_reason": "user_settings_update", "password": PASSWORD.rstrip(), "phone_token": phone_token}
-            client.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=HEADERS)
+            test = client.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=HEADERS).json()
+            print("[DEBUGGING 2] ", test)
         verifiedtoken()
     
     elif VERIFYCODE is None:
