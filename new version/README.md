@@ -29,7 +29,7 @@
 ### Configuring the Verification Tool:
 ------------------------------------
 Take a look in config.json. Here the File's content with a explaination what each line does:
-
+```json
 {
     "CAPTCHA STUFF": {
         "SERVICE": 1, # 1 = Capmonster, 2 = Anticaptcha, 3 = 2Captcha, 4 = captchaai.io, 5 = nocaptchaai.com, 6 = aio-hcaptcha
