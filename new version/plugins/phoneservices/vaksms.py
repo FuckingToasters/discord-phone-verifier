@@ -50,7 +50,7 @@ class vakverification:
         self.COUNTRY = country(self)
 
     def ordernumber(self):
-        url = f"https://vak-sms.com/api/getNumber/?apiKey={self.APIKEY}&service=dc&country={self.COUNTRY}{'&operator={self.OPERATOR}' if self.OPERATOR != 'any' else ''}&softId=34"
+        url = f"https://vak-sms.com/api/getNumber/?apiKey={self.APIKEY}&service=dc&country={self.COUNTRY}{f'&operator={self.OPERATOR}' if self.OPERATOR != 'any' else ''}&softId=34"
         with requests.Client(headers=None) as client: response = client.get(url).json()
         self.NUMBER, self.TZID = str(response["tel"]), response["idNum"]
         self.NUMBER = f"+{self.NUMBER}"
