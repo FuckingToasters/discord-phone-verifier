@@ -6,7 +6,7 @@ import time
 import pystyle
 
 from plugins.configuration.load import config
-CAPTCHASERVICE, CAPTCHAAPI, SITEKEY, _, _, _, _, _, _, _, _, _, _ = config().loadconfig()
+CAPTCHASERVICE, CAPTCHAKEY, SITEKEY, _, _, _, _, _, _, _, _, _, _ = config().loadconfig()
 BASEURL = "https://api.captchaai.io"
 HEADERS = {"Content-Type": "application/json"}
 TASKID = None
