@@ -1,13 +1,14 @@
 {
     "CAPTCHA STUFF": {
-        "SERVICE": 2,
+        "SERVICE": 1,
         "API KEY": "",
         "SITE KEY": "f5561ba9-8f1e-40ca-9b5b-a0b3f719ef34"
 
     },
 
     "PHONE STUFF": {
-        "SERVICE": "VAKSMS",
+        "SERVICE": "SMSHUB",
+	"OPERATOR": "mts",
         "RETRIES": 5,
 		
         "VAKSMS": {
@@ -18,6 +19,11 @@
         "FIVESIM": {
             "API KEY": "",
             "COUNTRY": "russia"
+        },
+		
+	"SMSHUB": {
+            "API KEY": "",
+            "COUNTRY": 6
         }
     },
 
