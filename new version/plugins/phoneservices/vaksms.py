@@ -52,6 +52,7 @@ class vakverification:
     def ordernumber(self):
         url = f"https://vak-sms.com/api/getNumber/?apiKey={self.APIKEY}&service=dc&country={self.COUNTRY}{f'&operator={self.OPERATOR}' if self.OPERATOR != 'any' else ''}&softId=34"
         with requests.Client(headers=None) as client: response = client.get(url).json()
+        print("[DEBUGGING 1] ", response, "[DEBUGGING 2] ", url)
         self.NUMBER, self.TZID = str(response["tel"]), response["idNum"]
         self.NUMBER = f"+{self.NUMBER}"
         return self.NUMBER, self.TZID
@@ -83,5 +84,5 @@ class vakverification:
                 return "TIMEOUT", False
         
         print(response)
-        self.VERIFYCODE = response["sms"][0]["code"]
+        self.VERIFYCODE = response["smsCode"]
         return waitcount, self.VERIFYCODE
