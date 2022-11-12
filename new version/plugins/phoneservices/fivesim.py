@@ -5,12 +5,13 @@ from plugins.configuration.load import config
 
 class fivesimverification:
     def __init__(self):
-        _, _, _, _, _, _, _, self.APIKEY, self.COUNTRY, _ = config().loadconfig()
-        self.COUNTRY = self.COUNTRY.lower()
+        _, _, _, _, self.OPERATOR, _, _, _, _, _, self.APIKEY, self.COUNTRY, _ = config().loadconfig()
+        self.COUNTRY = self.COUNTRY.lower() if self.COUNTRY is str else self.COUNTRY
         self.NUMBER = None
         self.TZID = None
         self.TIMEOUT = requests.Timeout(20.0, read=None)
         self.HEADERS = {"Authorization": f"Bearer {self.APIKEY}", "Accept": "application/json"}
+
 
     def ordernumber(self):
         url = f"https://5sim.net/v1/user/buy/activation/{self.COUNTRY}/any/discord"
@@ -21,9 +22,10 @@ class fivesimverification:
             fivesimverification.ordernumber(self)
         
         if response.status_code == 200: 
-            self.NUMBER, self.TZID = response.json()["phone"], response.json()["id"]
+            self.NUMBER, self.TZID = f"+{response.json()['phone']}", response.json()["id"]
             return self.NUMBER, self.TZID
     
+
     def deletenumber(self):
         url = f"https://5sim.net/v1/user/cancel/{self.TZID}"
         with requests.Client(headers=self.HEADERS) as client: response = client.get(url).json()
@@ -33,6 +35,7 @@ class fivesimverification:
         # if response["status"] == "update":  self.DELETED = True
         # return self.DELETED
     
+
     def getcode(self):
         waitcount = 0
         url = f"https://5sim.net/v1/user/check/{self.TZID}"
@@ -40,8 +43,7 @@ class fivesimverification:
 
         with requests.Client(headers=self.HEADERS) as client: response = client.get(url).json()
 
-        # {'id': 376167805, 'phone': '+79217195992', 'operator': 'megafon', 'product': 'discord', 'price': 4, 'status': 'PENDING', 'expires': '2022-11-03T11:07:07.153905Z', 'sms': [], 'created_at': '2022-11-03T10:52:07.153905Z', 'country': 'russia'}
-        while response["sms"] == []: 
+        while response["sms"] == []:
             waitcount += 1
 
             pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/120!\n", pystyle.Colors.yellow, interval=0)
@@ -52,6 +54,7 @@ class fivesimverification:
             if waitcount >= 120:
                 return "TIMEOUT", False
         
-        self.VERIFYCODE = response["sms"][0]["code"]
+        print(response)
+        self.VERIFYCODE = response["sms"][0]["code"] if response["status"] == "FINISHED" else None
         return waitcount, self.VERIFYCODE
     
