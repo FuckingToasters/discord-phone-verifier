@@ -6,7 +6,7 @@ from plugins.configuration.load import config
 
 class vakverification:
     def __init__(self):
-        _, _, _, _, _, self.APIKEY, self.COUNTRY, _, _, _ = config().loadconfig()
+        _, _, _, _, self.OPERATOR, _, self.APIKEY, self.COUNTRY, _, _, _, _, _ = config().loadconfig()
         self.BALANCE = None
         self.STOCK = None
         self.PRICE = None
@@ -50,7 +50,7 @@ class vakverification:
         self.COUNTRY = country(self)
 
     def ordernumber(self):
-        url = f"https://vak-sms.com/api/getNumber/?apiKey={self.APIKEY}&service=dc&country={self.COUNTRY}&softId=34"
+        url = f"https://vak-sms.com/api/getNumber/?apiKey={self.APIKEY}&service=dc&country={self.COUNTRY}&operator={self.OPERATOR}&softId=34"
         with requests.Client(headers=None) as client: response = client.get(url).json()
         self.NUMBER, self.TZID = str(response["tel"]), response["idNum"]
         self.NUMBER = f"+{self.NUMBER}"
@@ -67,23 +67,23 @@ class vakverification:
     
     def getcode(self):
         waitcount = 0
-        # url = f"https://vak-sms.com/api/getStatus/?apiKey={self.APIKEY}&idNum={self.TZID}"
-        url = f"https://vak-sms.com/api/getSmsCode/?apiKey={self.APIKEY}&idNum={self.TZID}"
+        url = f"https://vak-sms.com/api/getStatus/?apiKey={self.APIKEY}&idNum={self.TZID}"
         discordurl = "https://discord.com/api/v9/users/@me/phone"
 
-        with requests.Client() as client: response = client.get(url).json()
-            
+        with requests.Client(headers=self.HEADERS) as client: response = client.get(url).json()
+
+        # {'id': 376167805, 'phone': '+79217195992', 'operator': 'megafon', 'product': 'discord', 'price': 4, 'status': 'PENDING', 'expires': '2022-11-03T11:07:07.153905Z', 'sms': [], 'created_at': '2022-11-03T10:52:07.153905Z', 'country': 'russia'}
         while response["smsCode"] is None: 
             waitcount += 1
 
             pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/120!\n", pystyle.Colors.yellow, interval=0)
             with requests.Client(timeout=self.TIMEOUT) as client:
-                response = client.get(url).json()
+                response = client.get(url, headers=self.HEADERS).json()
                 time.sleep(.3)
             
             if waitcount >= 120:
                 return "TIMEOUT", False
         
         print(response)
-        self.VERIFYCODE = response["smsCode"]
+        self.VERIFYCODE = response["sms"][0]["code"]
         return waitcount, self.VERIFYCODE
