@@ -50,8 +50,7 @@ class vakverification:
         self.COUNTRY = country(self)
 
     def ordernumber(self):
-        if self.OPERATOR == "any": self.OPERATOR = "" # vaksms specific
-        url = f"https://vak-sms.com/api/getNumber/?apiKey={self.APIKEY}&service=dc&country={self.COUNTRY}&operator={self.OPERATOR}&softId=34"
+        url = f"https://vak-sms.com/api/getNumber/?apiKey={self.APIKEY}&service=dc&country={self.COUNTRY}{'&operator={self.OPERATOR}' if self.OPERATOR != 'any' else ''}&softId=34"
         with requests.Client(headers=None) as client: response = client.get(url).json()
         self.NUMBER, self.TZID = str(response["tel"]), response["idNum"]
         self.NUMBER = f"+{self.NUMBER}"
@@ -68,7 +67,7 @@ class vakverification:
     
     def getcode(self):
         waitcount = 0
-        url = f"https://vak-sms.com/api/getStatus/?apiKey={self.APIKEY}&idNum={self.TZID}"
+        url = f"https://vak-sms.com/api/getSmsCode/?apiKey={self.APIKEY}&idNum={self.TZID}"
         discordurl = "https://discord.com/api/v9/users/@me/phone"
 
         with requests.Client() as client: response = client.get(url).json()
