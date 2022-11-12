@@ -16,6 +16,7 @@ from plugins.filesupport.useragent import randomagentclass
 from plugins.captcha.hcaptchasolver import bypasscaptcha
 from plugins.phoneservices.vaksms import vakverification
 from plugins.phoneservices.fivesim import fivesimverification
+from plugins.phoneservices.smshub import smshubverification
 from plugins.configuration.load import config
 
 def print_main_menu(): return mainmenu.logo()
@@ -25,9 +26,10 @@ def verify(totalthreads, threadindex, proxytype):
     lock = threading.Lock()
     vaksms = vakverification()
     fivesim = fivesimverification()
+    smshub = smshubverification()
     bypasscap = bypasscaptcha()
     proxyauth = loadproxyclass().loadproxy(proxytype=proxytype)
-    _, _, _, PHONESERVICE, TOTALRETRIES, VAKAPIKEY, _, _, _, WEBHOOKURL = config().loadconfig()
+    _, _, _, PHONESERVICE, TOTALRETRIES, _, _, _, _, _, _, _, WEBHOOKURL = config().loadconfig()
     USERAGENT = randomagentclass().randomagent()
 
     """
@@ -127,10 +129,10 @@ def verify(totalthreads, threadindex, proxytype):
         except KeyError:
             if "id" in response.json(): lock.acquire(), pystyle.Write.Print(f"\t[+] Valid Token {TOKEN}!\n", pystyle.Colors.green, interval=0), lock.release()
     checktoken()
-
+    
     if str(PHONESERVICE).lower() == "vaksms": NUMBER, TZID = vaksms.ordernumber()
     elif str(PHONESERVICE).lower() == "fivesim": NUMBER, TZID = fivesim.ordernumber()
-
+    elif str(PHONESERVICE).lower() == "smshub": NUMBER, TZID = smshub.ordernumber(); NUMBER = f"+{NUMBER}"
 
     def verifiedtoken():
         with open("files/verifiedtoken.txt", "a+") as verifiedfile: verifiedfile.write(TOKENCOMBO)
@@ -168,12 +170,18 @@ def verify(totalthreads, threadindex, proxytype):
     data1 = {"captcha_key": None, "change_phone_reason": "user_settings_update", "phone": NUMBER}
     with httpx.Client(headers=HEADERS, timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
         resp2 = client.post("https://discord.com/api/v9/users/@me/phone", json=data1)
+        
         if "captcha_key" in resp2.json():
             if resp2.json()["captcha_key"] == ["You need to update your app to verify your phone number."]:
+
                 lock.acquire()
                 pystyle.Write.Print("\t[*] Solving captcha... please be patient!\n", pystyle.Colors.yellow, interval=0)
                 lock.release()
-                CAPTCHATOKEN = bypasscap.hcaptcha()
+
+                CAPTCHATOKEN = False
+                while CAPTCHATOKEN is False:
+                    CAPTCHATOKEN = bypasscap.hcaptcha()
+                    
                 data1["captcha_key"] = CAPTCHATOKEN
                 resp2 = client.post("https://discord.com/api/v9/users/@me/phone", json=data1)
                 captcha_required = True
@@ -192,6 +200,7 @@ def verify(totalthreads, threadindex, proxytype):
         retries = 0
         if str(PHONESERVICE).lower() == "vaksms": waitcount, verifycode = vaksms.getcode()
         elif str(PHONESERVICE).lower() == "fivesim": waitcount, verifycode = fivesim.getcode()
+        elif str(PHONESERVICE).lower() == "smshub": waitcount, verifycode = smshub.getcode()
 
         discordurl = "https://discord.com/api/v9/users/@me/phone"
         discordresponse = None
@@ -207,14 +216,16 @@ def verify(totalthreads, threadindex, proxytype):
             if retries >= TOTALRETRIES:
                 pystyle.Write.Print(f"\t[-] Failed to get SMS code after {TOTALRETRIES} retries, switching token!\n", pystyle.Colors.red, interval=0)
                 removetoken()
-                if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
-                elif str(PHONESERVICE).lower() == "fivesim": fivesim.deletenumber()
+                if str(PHONESERVICE).lower() == "vaksms": waitcount, verifycode = vaksms.getcode()
+                elif str(PHONESERVICE).lower() == "fivesim": waitcount, verifycode = fivesim.getcode()
+                elif str(PHONESERVICE).lower() == "smshub": waitcount, verifycode = smshub.getcode()
                 verify(totalthreads, threadindex, proxytype)
             
             else:
                 pystyle.Write.Print(f"\t[-] Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...\n", pystyle.Colors.red, interval=0)
-                if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
-                elif str(PHONESERVICE).lower() == "fivesim": fivesim.deletenumber()
+                if str(PHONESERVICE).lower() == "vaksms": waitcount, verifycode = vaksms.getcode()
+                elif str(PHONESERVICE).lower() == "fivesim": waitcount, verifycode = fivesim.getcode()
+                elif str(PHONESERVICE).lower() == "smshub": waitcount, verifycode = smshub.getcode()
                 verify(totalthreads, threadindex, proxytype)
 
         return verifycode
@@ -226,13 +237,11 @@ def verify(totalthreads, threadindex, proxytype):
         with httpx.Client(timeout=timeout, proxies=proxyauth if proxytype != "" else None) as client:
             url = "https://discord.com/api/v9/phone-verifications/verify"
             resp4 = client.post(url, json=data2, headers=HEADERS).json()
-            print("[DEBUGGING 1] ", resp4)
             try: phone_token = resp4["token"]
             except KeyError: phone_token = None
             
             data3 = {"change_phone_reason": "user_settings_update", "password": PASSWORD.rstrip(), "phone_token": phone_token}
-            test = client.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=HEADERS).json()
-            print("[DEBUGGING 2] ", test)
+            client.post("https://discord.com/api/v9/users/@me/phone", json=data3, headers=HEADERS)
         verifiedtoken()
     
     elif VERIFYCODE is None:
