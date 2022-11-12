@@ -6,7 +6,7 @@ from plugins.configuration.load import config
 
 class vakverification:
     def __init__(self):
-        _, _, _, _, self.OPERATOR, _, self.APIKEY, self.COUNTRY, _, _, _, _, _ = config().loadconfig()
+        _, _, _, _, _, self.OPERATOR, self.APIKEY, self.COUNTRY, _, _, _, _, _ = config().loadconfig()
         self.BALANCE = None
         self.STOCK = None
         self.PRICE = None
@@ -52,7 +52,7 @@ class vakverification:
     def ordernumber(self):
         url = f"https://vak-sms.com/api/getNumber/?apiKey={self.APIKEY}&service=dc&country={self.COUNTRY}{f'&operator={self.OPERATOR}' if self.OPERATOR != 'any' else ''}&softId=34"
         with requests.Client(headers=None) as client: response = client.get(url).json()
-        print("[DEBUGGING 1] ", response, "[DEBUGGING 2] ", url)
+        # print("[DEBUGGING 1] ", response, "[DEBUGGING 2] ", url)
         self.NUMBER, self.TZID = str(response["tel"]), response["idNum"]
         self.NUMBER = f"+{self.NUMBER}"
         return self.NUMBER, self.TZID
