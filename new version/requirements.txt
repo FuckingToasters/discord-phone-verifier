@@ -1,5 +1,0 @@
-httpx
-httpx[socks]
-captchatools
-pystyle==2.0
-brotlipy
