@@ -276,7 +276,7 @@ def verify(totalthreads, threadindex, proxytype):
 
 if __name__ == "__main__":
     from plugins.design import mainmenu
-    from plugins.filesupport.init_threads import initializethreadsclass
+    from plugins.misc.init_threads import initializethreadsclass
 
     mainmenu.logo()
     totalthreads, proxyinput = initializethreadsclass().initthread()
