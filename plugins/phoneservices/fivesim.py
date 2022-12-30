@@ -8,7 +8,10 @@ from plugins.misc.get_discord_headers import getheadersclass
 
 class fivesimverification:
     def __init__(self, **kwargs):
-        self.DISCORDHEADERS = getheadersclass.getheaders()
+        self.TOTALTHREADS = kwargs.pop("TOTALTHREADS")
+        self.THREADINDEX = kwargs.pop("THREADINDEX")
+        self.DISCORDHEADERS = getheadersclass.getheaders(self.TOTALTHREADS, self.THREADINDEX)
+
         self.OPERATOR = kwargs.pop("OPERATOR")
         self.APIKEY = kwargs.pop("FIVESIMAPIKEY")
         self.COUNTRY = kwargs.pop("FIVESIMCOUNTRY")
