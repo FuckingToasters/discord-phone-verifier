@@ -10,9 +10,9 @@ import re
 
 from discord_webhook import DiscordWebhook, DiscordEmbed
 from datetime import date
-from plugins.filesupport.gettoken import gettokenclass
-from plugins.filesupport.proxy import loadproxyclass
-from plugins.filesupport.get_discord_headers import getheadersclass
+from plugins.misc.gettoken import gettokenclass
+from plugins.misc.proxy import loadproxyclass
+from plugins.misc.get_discord_headers import getheadersclass
 from plugins.captcha.hcaptchasolver import bypasscaptcha
 from plugins.phoneservices.vaksms import vakverification
 from plugins.phoneservices.fivesim import fivesimverification
