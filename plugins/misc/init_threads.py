@@ -3,7 +3,7 @@ import pystyle
 import threading
 
 class initializethreadsclass:
-    def initthread(self):
+    def initthread():
         with open("files/tokens.txt") as tc:
             tcline = tc.readlines()
             if tcline == []: pystyle.Write.Print("\t[-] No Token found inside files/tokens.txt!\n", pystyle.Colors.red, interval=0), sys.exit(69)
