@@ -9,7 +9,10 @@ from plugins.misc.get_discord_headers import getheadersclass
 
 class vakverification:
     def __init__(self, **kwargs):
-        self.DISCORDHEADERS = getheadersclass.getheaders()
+        self.TOTALTHREADS = kwargs.pop("TOTALTHREADS")
+        self.THREADINDEX = kwargs.pop("THREADINDEX")
+        self.DISCORDHEADERS = getheadersclass.getheaders(self.TOTALTHREADS, self.THREADINDEX)
+
         self.OPERATOR = kwargs.pop("OPERATOR")
         self.APIKEY = kwargs.pop("VAKAPIKEY")
         self.COUNTRY = kwargs.pop("VAKCOUNTRY")
@@ -61,7 +64,7 @@ class vakverification:
         self.NUMBER, self.TZID = str(response["tel"]), response["idNum"]
         self.NUMBER = f"+{self.NUMBER}"
         return self.NUMBER, self.TZID
-    
+
     def deletenumber(self):
         url = f"https://vak-sms.com/api/setStatus/?apiKey={self.APIKEY}&status=end&idNum={self.TZID}"
         response = requests.get(url).json()
@@ -70,7 +73,7 @@ class vakverification:
         # with requests.Client(headers=None) as client: response = client.get(url).json()
         # if response["status"] == "update":  self.DELETED = True
         # return self.DELETED
-    
+
     def getcode(self):
         waitcount = 0
         session = tls_client.Session(client_identifier="safari_ios_16_0")
@@ -80,14 +83,14 @@ class vakverification:
         ratelimited = False
         ratelimit_duration = None
         with requests.Client() as client: response = client.get(url).json()
-        while response["smsCode"] is None: 
+        while response["smsCode"] is None:
             waitcount += 1
 
             pystyle.Write.Print(f"\t[*] Discord haven't sent the SMS so far... {waitcount}/120!\n", pystyle.Colors.yellow, interval=0)
             with requests.Client(timeout=self.TIMEOUT) as client:
                 response = client.get(url).json()
                 time.sleep(.3)
-            
+
             if ratelimited:
                 time.sleep(int(ratelimit_duration))
 
@@ -110,6 +113,6 @@ class vakverification:
 
             if waitcount >= 120:
                 return "TIMEOUT", False
-        
+
         self.VERIFYCODE = response["smsCode"]
         return waitcount, self.VERIFYCODE
