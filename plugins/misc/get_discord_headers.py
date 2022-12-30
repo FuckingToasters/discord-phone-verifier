@@ -3,8 +3,10 @@ from plugins.misc.useragent import randomagentclass
 from plugins.misc.generate_superproperties import randompropertiesclass
 
 class getheadersclass:
-    def getheaders():
-        TOKEN = gettokenclass().gettoken()[1].strip()
+
+    @staticmethod
+    def getheaders(totalthreads, threadindex):
+        TOKEN = gettokenclass.gettoken(totalthreads, threadindex)[1].strip()
         USERAGENT = randomagentclass().randomagent()
         PROPERTIES = randompropertiesclass().generate_properties()
         HEADERS = {
