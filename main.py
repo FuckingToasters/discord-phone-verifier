@@ -286,7 +286,6 @@ if __name__ == "__main__":
 
     mainmenu.logo()
     totalthreads, proxyinput = initializethreadsclass.initthread()
-    print(totalthreads, proxyinput)
 
     threads = []
     try:
