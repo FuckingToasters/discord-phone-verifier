@@ -20,7 +20,7 @@ from plugins.phoneservices.smshub import smshubverification
 from plugins.configuration.load import config
 
 def verify(totalthreads, threadindex, proxytype):
-    HEADERS = getheadersclass.getheaders()
+    HEADERS = getheadersclass.getheaders(totalthreads, threadindex)
     CONFIG = list(config().loadconfig())
     CAPTCHASERVICE = CONFIG[0]
     CAPTCHAPIKEY = CONFIG[1]
@@ -39,6 +39,8 @@ def verify(totalthreads, threadindex, proxytype):
     captcha_required = False
     lock = threading.Lock()
     vaksms = vakverification(
+        TOTALTHREADS=totalthreads,
+        THREADINDEX=threadindex,
         CAPTCHASERVICE=CAPTCHASERVICE,
         CAPTCHAPIKEY=CAPTCHAPIKEY,
         CAPTCHASITEKEY=CAPTCHASITEKEY,
@@ -55,6 +57,8 @@ def verify(totalthreads, threadindex, proxytype):
     )
 
     fivesim = fivesimverification(
+        TOTALTHREADS=totalthreads,
+        THREADINDEX=threadindex,
         CAPTCHASERVICE=CAPTCHASERVICE,
         CAPTCHAPIKEY=CAPTCHAPIKEY,
         CAPTCHASITEKEY=CAPTCHASITEKEY,
@@ -71,6 +75,8 @@ def verify(totalthreads, threadindex, proxytype):
     )
 
     smshub = smshubverification(
+        TOTALTHREADS=totalthreads,
+        THREADINDEX=threadindex,
         CAPTCHASERVICE=CAPTCHASERVICE,
         CAPTCHAPIKEY=CAPTCHAPIKEY,
         CAPTCHASITEKEY=CAPTCHASITEKEY,
@@ -104,7 +110,7 @@ def verify(totalthreads, threadindex, proxytype):
 
     proxyauth = loadproxyclass().loadproxy(proxytype=proxytype)[0]
     session = tls_client.Session(client_identifier="chrome_108")
-    TOKENCOMBO, TOKEN, PASSWORD = gettokenclass.gettoken(None)
+    TOKENCOMBO, TOKEN, PASSWORD = gettokenclass.gettoken(totalthreads, threadindex)
 
     def removetoken():
         with open("files/tokens.txt", "r+") as tokenfile:
@@ -116,7 +122,7 @@ def verify(totalthreads, threadindex, proxytype):
             else: pass
             # else: lock.acquire(), pystyle.Write.Print(f"\t[-] Every Token from files/tokens.txt got used. File need to be refilled!\n", pystyle.Colors.red, interval=0), lock.release(), sys.exit(1)
         with open("files/failedverify.txt", "a+") as failedfile: failedfile.write(TOKENCOMBO)
-    
+
     def removeinvalidtoken():
         with open("files/tokens.txt", "r+") as tokenfile:
             tokenfile.seek(0)
@@ -135,11 +141,11 @@ def verify(totalthreads, threadindex, proxytype):
                 removeinvalidtoken()
                 pystyle.Write.Print(f"\t[-] Invalid Token: {TOKEN}!\n", pystyle.Colors.red, interval=0)
                 verify(totalthreads, threadindex, proxytype)
-        
+
         except KeyError:
             if "id" in response.json(): lock.acquire(), pystyle.Write.Print(f"\t[+] Valid Token {TOKEN}!\n", pystyle.Colors.green, interval=0), lock.release()
     checktoken()
-    
+
     if str(PHONESERVICE).lower() == "vaksms": NUMBER, TZID = vaksms.ordernumber()
     elif str(PHONESERVICE).lower() == "fivesim": NUMBER, TZID = fivesim.ordernumber()
     elif str(PHONESERVICE).lower() == "smshub": NUMBER, TZID = smshub.ordernumber(); NUMBER = f"+{NUMBER}"
@@ -161,7 +167,7 @@ def verify(totalthreads, threadindex, proxytype):
                 title='New Verified Token!',
                 color='03b2f8'
                 )
-            
+
             embed.add_embed_field(name='Token', value=f"`{TOKEN}`", inline=False)
             embed.add_embed_field(name='Number', value=f"`{NUMBER}`", inline=False)
             embed.add_embed_field(name='SMS Code', value=f"`{VERIFYCODE}`", inline=False)
@@ -176,7 +182,7 @@ def verify(totalthreads, threadindex, proxytype):
     lock.acquire()
     pystyle.Write.Print(f"\t[+] Sucessfully got Number {NUMBER}\n", pystyle.Colors.green, interval=0)
     lock.release()
-    
+
     data1 = {"captcha_key": None, "change_phone_reason": "user_settings_update", "phone": NUMBER}
     resp2 = session.post(
         url="https://discord.com/api/v9/users/@me/phone",
@@ -212,7 +218,7 @@ def verify(totalthreads, threadindex, proxytype):
         lock.acquire()
         pystyle.Write.Print("\t[*] No Captcha Solving required... Skipping!\n", pystyle.Colors.yellow, interval=0)
         lock.release()
-            
+
     lock.acquire()
     if resp2.status_code == 204: pystyle.Write.Print("\t[+] Successfully requested verification code!\n", pystyle.Colors.green, interval=0)
     lock.release()
@@ -223,7 +229,7 @@ def verify(totalthreads, threadindex, proxytype):
         if str(PHONESERVICE).lower() == "vaksms": waitcount, verifycode = vaksms.getcode()
         elif str(PHONESERVICE).lower() == "fivesim": waitcount, verifycode = fivesim.getcode()
         elif str(PHONESERVICE).lower() == "smshub": waitcount, verifycode = smshub.getcode()
-        
+
         if waitcount == "TIMEOUT":
             retries += 1
             if retries >= TOTALRETRIES:
@@ -233,7 +239,7 @@ def verify(totalthreads, threadindex, proxytype):
                 elif str(PHONESERVICE).lower() == "fivesim": waitcount, verifycode = fivesim.getcode()
                 elif str(PHONESERVICE).lower() == "smshub": waitcount, verifycode = smshub.getcode()
                 verify(totalthreads, threadindex, proxytype)
-            
+
             else:
                 pystyle.Write.Print(f"\t[-] Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...\n", pystyle.Colors.red, interval=0)
                 if str(PHONESERVICE).lower() == "vaksms": waitcount, verifycode = vaksms.getcode()
@@ -243,7 +249,7 @@ def verify(totalthreads, threadindex, proxytype):
 
         return verifycode
     VERIFYCODE = waitsms()
-    
+
     if VERIFYCODE is not None:
         lock.acquire(), pystyle.Write.Print(f"\t[*] Found Verificationcode: {VERIFYCODE}, sending it to Discord...\n", pystyle.Colors.pink, interval=0), lock.release()
         data2 = {"phone": NUMBER, "code": VERIFYCODE}
@@ -268,7 +274,7 @@ def verify(totalthreads, threadindex, proxytype):
         )
 
         verifiedtoken()
-    
+
     elif VERIFYCODE is None:
         lock.acquire(), pystyle.Write.Print(f"\t[-] Failed to get verification code! Rerunning...\n", pystyle.Colors.red, interval=0), lock.release()
         removetoken()
@@ -279,7 +285,8 @@ if __name__ == "__main__":
     from plugins.misc.init_threads import initializethreadsclass
 
     mainmenu.logo()
-    totalthreads, proxyinput = initializethreadsclass().initthread()
+    totalthreads, proxyinput = initializethreadsclass.initthread()
+    print(totalthreads, proxyinput)
 
     threads = []
     try:
