@@ -26,6 +26,8 @@
 
 > A lot more improvments & still in development
 
+### Note: If discord don't send the sms, try the new dev branch version: https://github.com/FuckingToasters/discord-phone-verifier/tree/dev
+
 ### Configuring the Verification Tool:
 ------------------------------------
 Take a look in config.json. Here the File's content with a explaination what each line does:
