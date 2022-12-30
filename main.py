@@ -172,7 +172,7 @@ def verify(totalthreads, threadindex, proxytype):
             embed.add_embed_field(name='Number', value=f"`{NUMBER}`", inline=False)
             embed.add_embed_field(name='SMS Code', value=f"`{VERIFYCODE}`", inline=False)
             embed.add_embed_field(name='Captcha Required', value=f"`{captcha_required}`", inline=False)
-            embed.set_author(name='Infinimonster#0001', icon_url=iconurl)
+            embed.set_author(name='Infinimonster#0002', icon_url=iconurl)
             embed.set_footer(text='Discord Token Verifier', icon_url=iconurl)
             embed.set_timestamp()
             webhook.add_embed(embed)
