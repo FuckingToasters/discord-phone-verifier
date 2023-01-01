@@ -47,6 +47,7 @@ class fivesimverification:
 
     def getcode(self):
         waitcount = 0
+        session = tls_client.Session(client_identifier="safari_ios_16_0")
         url = f"https://5sim.net/v1/user/check/{self.TZID}"
         discordurl = "https://discord.com/api/v9/users/@me/phone"
 
