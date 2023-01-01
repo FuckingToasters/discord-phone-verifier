@@ -83,6 +83,6 @@ class fivesimverification:
             if waitcount >= 120:
                 return "TIMEOUT", False
 
-        self.VERIFYCODE = response["sms"][0]["code"] if response["status"] == "FINISHED" else None
+        self.VERIFYCODE = response["sms"][0]["code"] if response["status"] == "FINISHED" else None # FINISHED may need to be changed to RECIVED if verification failed error happen after sms got delivered
         return waitcount, self.VERIFYCODE
 
