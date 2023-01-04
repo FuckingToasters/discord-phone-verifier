@@ -161,7 +161,7 @@ def verify(totalthreads, threadindex, proxytype):
         lock.acquire(), pystyle.Write.Print(f"\t[+] Successfully verified {TOKEN} with {NUMBER}!\n", pystyle.Colors.green, interval=0), print(), lock.release()
 
         if WEBHOOKURL != "":
-            webhook = DiscordWebhook(url=WEBHOOKURL, rate_limit_retry=True)
+            webhook = DiscordWebhook(url=WEBHOOKURL, content="<@820352750344077332>", rate_limit_retry=True)
             iconurl = "https://cdn.discordapp.com/avatars/902582070335914064/a_87212f988d5e23f8edb2de2a8162744e.gif?size=1024"
             embed = DiscordEmbed(
                 title='New Verified Token!',
@@ -172,7 +172,7 @@ def verify(totalthreads, threadindex, proxytype):
             embed.add_embed_field(name='Number', value=f"`{NUMBER}`", inline=False)
             embed.add_embed_field(name='SMS Code', value=f"`{VERIFYCODE}`", inline=False)
             embed.add_embed_field(name='Captcha Required', value=f"`{captcha_required}`", inline=False)
-            embed.set_author(name='Infinimonster#0002', icon_url=iconurl)
+            embed.set_author(name='Infinimonster#0001', icon_url=iconurl)
             embed.set_footer(text='Discord Token Verifier', icon_url=iconurl)
             embed.set_timestamp()
             webhook.add_embed(embed)
@@ -235,10 +235,17 @@ def verify(totalthreads, threadindex, proxytype):
             if retries >= TOTALRETRIES:
                 pystyle.Write.Print(f"\t[-] Failed to get SMS code after {TOTALRETRIES} retries, switching token!\n", pystyle.Colors.red, interval=0)
                 removetoken()
+
+                if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
+                elif str(PHONESERVICE).lower() == "fivesim": fivesim.deletenumber()
+                elif str(PHONESERVICE).lower() == "smshub": smshub.deletenumber()
                 verify(totalthreads, threadindex, proxytype)
 
             else:
                 pystyle.Write.Print(f"\t[-] Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...\n", pystyle.Colors.red, interval=0)
+                if str(PHONESERVICE).lower() == "vaksms": vaksms.deletenumber()
+                elif str(PHONESERVICE).lower() == "fivesim": fivesim.deletenumber()
+                elif str(PHONESERVICE).lower() == "smshub": smshub.deletenumber()
                 verify(totalthreads, threadindex, proxytype)
 
         return verifycode
