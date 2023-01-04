@@ -235,16 +235,10 @@ def verify(totalthreads, threadindex, proxytype):
             if retries >= TOTALRETRIES:
                 pystyle.Write.Print(f"\t[-] Failed to get SMS code after {TOTALRETRIES} retries, switching token!\n", pystyle.Colors.red, interval=0)
                 removetoken()
-                if str(PHONESERVICE).lower() == "vaksms": waitcount, verifycode = vaksms.getcode()
-                elif str(PHONESERVICE).lower() == "fivesim": waitcount, verifycode = fivesim.getcode()
-                elif str(PHONESERVICE).lower() == "smshub": waitcount, verifycode = smshub.getcode()
                 verify(totalthreads, threadindex, proxytype)
 
             else:
                 pystyle.Write.Print(f"\t[-] Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...\n", pystyle.Colors.red, interval=0)
-                if str(PHONESERVICE).lower() == "vaksms": waitcount, verifycode = vaksms.getcode()
-                elif str(PHONESERVICE).lower() == "fivesim": waitcount, verifycode = fivesim.getcode()
-                elif str(PHONESERVICE).lower() == "smshub": waitcount, verifycode = smshub.getcode()
                 verify(totalthreads, threadindex, proxytype)
 
         return verifycode
