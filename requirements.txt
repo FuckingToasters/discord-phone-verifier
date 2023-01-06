@@ -1,6 +1,6 @@
 httpx
 httpx[socks]
-captchatools
-invisifox
+captchatools==1.2.1
+tls-client
 pystyle==2.0
 brotlipy
