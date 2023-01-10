@@ -1,5 +1,5 @@
 httpx
 httpx[socks]
-captchatools
+captchatools==1.2.1
 pystyle==2.0
 brotlipy
