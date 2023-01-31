@@ -78,6 +78,7 @@ class smshubverification:
 
     def getcode(self):
         waitcount = 0
+        session = tls_client.Session(client_identifier="safari_ios_16_0")
         url = f"https://smshub.org/stubs/handler_api.php?api_key={self.APIKEY}&action=getStatus&id={self.TZID}"
         discordurl = "https://discord.com/api/v9/users/@me/phone"
         with requests.Client() as client: response = client.get(url)
