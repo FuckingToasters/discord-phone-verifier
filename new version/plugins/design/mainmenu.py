@@ -19,6 +19,7 @@ def logo():
     \t                                                                            
     \t━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     \tcreated by {developer} | https://github.com/FuckingToasters/discord-phone-verifier\n
+    \t If Discord don't send an SMS, try the DEV Branch Version: https://github.com/FuckingToasters/discord-phone-verifier/tree/dev
     """
     clear_terminal()
     pystyle.Write.Print(font, pystyle.Colors.cyan, interval=0)
