@@ -8,7 +8,7 @@
 
     "PHONE STUFF": {
         "SERVICE": "VAKSMS",
-		"OPERATOR": "any",
+	"OPERATOR": "any",
         "RETRIES": 5,
 		
         "VAKSMS": {
@@ -21,7 +21,7 @@
             "COUNTRY": "russia"
         },
 		
-		"SMSHUB": {
+	"SMSHUB": {
             "API KEY": "",
             "COUNTRY": 6
         }
