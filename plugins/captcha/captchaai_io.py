@@ -7,7 +7,7 @@ import pystyle
 
 from plugins.configuration.load import config
 CAPTCHASERVICE, CAPTCHAKEY, SITEKEY, _, _, _, _, _, _, _, _, _, _ = config().loadconfig()
-BASEURL = "https://api.captchaai.io"
+BASEURL = "https://api.capsolver.com"
 HEADERS = {"Content-Type": "application/json"}
 TASKID = None
 
@@ -23,7 +23,7 @@ class Solver:
             "isEnterprise": True,
             "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0",
             "task": {
-                "type":"HCaptchaTaskProxyless",
+                "type":"HCaptchaTurboTaskProxyLess",
                 "websiteURL":"https://discord.com/api/v9/users/@me/phone",
                 "websiteKey": SITEKEY
             }
