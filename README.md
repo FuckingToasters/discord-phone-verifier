@@ -7,7 +7,11 @@ This feature can be enabled / disabled in config.json with the next update.
  #### Why is this useful?
 ------------------------------------
 It avoids to get sms verification code and then fail to verify account due to wrong password.
-Why would i want to keep it disabled? It request a second captcha solution if required, you may want to rather waste sms than submitting an second captcha solution if the price for capsolving is higher than for ordering an SMS. Pricing depends on captcha solving service and SMS Solving Service so you are going to decide what's better for you.
+
+ #### Why would i want to keep it disabled?
+------------------------------------
+It request a second captcha solution if required, you may want to rather waste sms than submitting an second captcha solution if the price for capsolving is higher than for ordering an SMS.\
+Pricing depends on captcha solving service and SMS Solving Service so you are going to decide what's better for you.
 
 
 ### Configuring the Verification Tool:
