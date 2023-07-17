@@ -19,6 +19,7 @@ def logo():
     \t
     \t━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     \tcreated by {developer} | https://github.com/FuckingToasters/discord-phone-verifier\n
+    \tSponsored (own Forum): https://thevault.net.ru\n
     """
     clear_terminal()
     pystyle.Write.Print(font, pystyle.Colors.cyan, interval=0)
